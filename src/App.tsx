@@ -1,16 +1,25 @@
-import React from "react"
-import "./App.css"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Sidebar from "./components/ui/sidebar";
+import Landing from "./pages/landing";
+
+const Dashboard = () => <div className="p-4">Dashboard Page</div>;
+const Settings = () => <div className="p-4">Settings Page</div>;
 
 const App: React.FC = () => {
   return (
-    <div className="landing-container">
-      <header className="landing-header">
-        <h1>Welcome to StratMap</h1>
-        <p>Your strategic mapping solution</p>
-        <button>Get Started</button>
-      </header>
-    </div>
+    <BrowserRouter>
+      <div className="flex">
+        <Sidebar />
+        <main className="flex-1 p-4">
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
   );
 };
 
-export default App
+export default App;
