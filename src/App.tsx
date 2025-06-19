@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/ui/sidebar";
 import Landing from "./pages/landing";
+import Stratmaker from "./pages/stratmaker";
 
 const Dashboard = () => <div className="p-4">Dashboard Page</div>;
 const Settings = () => <div className="p-4">Settings Page</div>;
@@ -15,6 +16,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Landing />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/stratmaker" element={<Stratmaker />} />
           </Routes>
         </main>
       </div>

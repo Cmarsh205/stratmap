@@ -10,7 +10,7 @@ const Sidebar = () => {
         <img
           src={logo}
           alt="StratMap Logo"
-          className="h-10 w-auto mx-auto"
+          className="h-10 w-40 mx-auto"
         />
       </div>
       <nav className="flex flex-col gap-4">
@@ -39,6 +39,15 @@ const Sidebar = () => {
           >
             <Settings className="mr-2 h-4 w-4" />
             Settings
+          </Button>
+        </Link>
+        <Link to="/stratmaker">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-white pl-4"
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            StratMaker
           </Button>
         </Link>
       </nav>
