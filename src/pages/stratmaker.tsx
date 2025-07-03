@@ -2,6 +2,7 @@ import { Tldraw } from "tldraw";
 import "tldraw/tldraw.css";
 import MapDropdown from "@/components/MapAndFloorMenu";
 import OperatorSidebar from "@/components/OperatorIconMenu";
+import SaveCanvasButton from "@/components/SaveBtn";
 
 declare global {
   interface Window {
@@ -15,7 +16,7 @@ const Stratmaker = () => {
       className="relative w-full h-screen"
       onDrop={(e) => {
         const editor = window.__tldraw_editor;
-        const iconUrl = e.dataTransfer.getData("operator-icon"); // <- PNG path
+        const iconUrl = e.dataTransfer.getData("operator-icon");
 
         if (iconUrl && editor) {
           const mousePoint = editor.screenToPage({
@@ -25,7 +26,6 @@ const Stratmaker = () => {
 
           const assetId = `asset:${crypto.randomUUID()}`;
           const shapeId = `shape:${crypto.randomUUID()}`;
-
           const width = 80;
           const height = 80;
 
@@ -74,6 +74,10 @@ const Stratmaker = () => {
       >
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
           <MapDropdown />
+        </div>
+
+        <div className="absolute bottom-4 right-[20%] z-50">
+          <SaveCanvasButton />
         </div>
       </Tldraw>
 
