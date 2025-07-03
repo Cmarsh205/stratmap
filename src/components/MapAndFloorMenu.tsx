@@ -95,7 +95,7 @@ const imageCategories = {
   ],
 };
 
-const ImageDropdown = () => {
+const MapDropdown = () => {
   const editor = useEditor();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -185,4 +185,4 @@ const ImageDropdown = () => {
   );
 };
 
-export default ImageDropdown;
+export default MapDropdown;
