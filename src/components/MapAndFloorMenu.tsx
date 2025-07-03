@@ -1,6 +1,18 @@
 import { useEditor } from "tldraw";
-import { useState } from "react";
 import type { TLAssetId, TLShapeId } from "tldraw";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Map } from "lucide-react";
 
 const imageCategories = {
   Bank: [
@@ -97,7 +109,6 @@ const imageCategories = {
 
 const MapDropdown = () => {
   const editor = useEditor();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const insertImage = (url: string) => {
     if (!editor) return;
@@ -114,7 +125,7 @@ const MapDropdown = () => {
         type: "image",
         typeName: "asset",
         props: {
-          name: "image",
+          name: "map",
           src: url,
           mimeType: url.endsWith(".png")
             ? "image/png"
@@ -146,42 +157,46 @@ const MapDropdown = () => {
         },
       },
     ]);
-    setSelectedCategory(null);
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow max-w-sm space-y-2">
-      <select
-        key={selectedCategory ?? "initial"}
-        value={selectedCategory ?? ""}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-        className="w-full border rounded p-2"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button className="bg-[#1E293B] text-yellow-400 hover:bg-[#334155] hover:text-yellow-300 flex items-center gap-2 px-4 py-2 rounded-md shadow group">
+          <Map className="w-4 h-4 text-yellow-400 group-hover:text-yellow-300" />
+          Choose Map
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        className="bg-[#1E293B] border border-slate-700 text-yellow-300 w-56 max-h-96 overflow-y-auto shadow-lg"
+        sideOffset={8}
       >
-        <option value="" disabled>
-          Select Map
-        </option>
-        {Object.keys(imageCategories).map((maps) => (
-          <option key={maps} value={maps}>
-            {maps}
-          </option>
+        <DropdownMenuLabel className="text-yellow-400 font-bold text-sm px-2 py-1">
+          Select Map & Floor
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-slate-600" />
+
+        {Object.entries(imageCategories).map(([mapName, floors]) => (
+          <DropdownMenuSub key={mapName}>
+            <DropdownMenuSubTrigger className="text-yellow-200 hover:bg-[#334155] px-2 py-1">
+              {mapName}
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className="bg-[#1E293B] text-yellow-200 border-slate-700">
+              {floors.map((floor) => (
+                <DropdownMenuItem
+                  key={floor.label}
+                  onClick={() => insertImage(floor.src)}
+                  className="hover:bg-yellow-500 hover:text-slate-900 px-2 py-1 cursor-pointer"
+                >
+                  {floor.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
         ))}
-      </select>
-      {selectedCategory && (
-        <div className="space-y-1">
-          {imageCategories[
-            selectedCategory as keyof typeof imageCategories
-          ].map((img) => (
-            <button
-              key={img.label}
-              onClick={() => insertImage(img.src)}
-              className="w-full text-left p-2 bg-gray-100 rounded hover:bg-gray-200"
-            >
-              {img.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
