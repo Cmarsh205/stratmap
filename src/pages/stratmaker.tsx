@@ -1,8 +1,10 @@
-import { Tldraw } from "tldraw";
+import { Tldraw, createTLStore, defaultShapeUtils } from "tldraw";
 import "tldraw/tldraw.css";
 import MapDropdown from "@/components/MapAndFloorMenu";
 import OperatorSidebar from "@/components/OperatorIconMenu";
 import SaveCanvasButton from "@/components/SaveBtn";
+import { useMemo } from "react";
+import { useParams } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -11,6 +13,33 @@ declare global {
 }
 
 const Stratmaker = () => {
+  const { name } = useParams();
+  const store = useMemo(
+    () => createTLStore({ shapeUtils: defaultShapeUtils }),
+    []
+  );
+
+  const handleMount = (editor: any) => {
+    window.__tldraw_editor = editor;
+
+    if (name) {
+      const key = `tldraw-strat:${name}`;
+      const saved = localStorage.getItem(key);
+
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          console.log("✅ Loading strat:", name, data);
+          editor.store.loadSnapshot(data);
+        } catch (error) {
+          console.error("❌ Failed to parse saved strat data:", error);
+        }
+      } else {
+        console.warn("⚠️ No saved strat found for:", key);
+      }
+    }
+  };
+
   return (
     <div
       className="relative w-full h-screen"
@@ -67,11 +96,7 @@ const Stratmaker = () => {
       }}
       onDragOver={(e) => e.preventDefault()}
     >
-      <Tldraw
-        onMount={(editor) => {
-          window.__tldraw_editor = editor;
-        }}
-      >
+      <Tldraw store={store} onMount={handleMount}>
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
           <MapDropdown />
         </div>

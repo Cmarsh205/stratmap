@@ -1,18 +1,27 @@
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useParams } from "react-router-dom";
 
 const SaveCanvasButton = () => {
+  const editor = window.__tldraw_editor;
+  const { name } = useParams();
+
   const handleSave = () => {
-    const editor = window.__tldraw_editor;
     if (!editor) return;
 
-    const name = prompt("Enter a name for your canvas:");
-    if (!name) return;
+    if (name) {
+      const data = editor.store.getSnapshot();
+      localStorage.setItem(`tldraw-strat:${name}`, JSON.stringify(data));
+      alert(`Strat "${name}" updated!`);
+      return;
+    }
 
-    const data = editor.store.serialize();
-    localStorage.setItem(`tldraw-canvas:${name}`, JSON.stringify(data));
+    const fallbackName = prompt("Enter a name for your strat:");
+    if (!fallbackName) return;
 
-    alert(`Canvas "${name}" saved!`);
+    const data = editor.store.getSnapshot();
+    localStorage.setItem(`tldraw-strat:${fallbackName}`, JSON.stringify(data));
+    alert(`Strat "${fallbackName}" saved!`);
   };
 
   return (
