@@ -1,17 +1,20 @@
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
+import { getSnapshot } from "tldraw";
 
 const SaveCanvasButton = () => {
   const editor = window.__tldraw_editor;
   const { name } = useParams();
-
+  const PERSISTENCE_KEY = `tldraw-strat:${name ?? "default"}`;
   const handleSave = () => {
     if (!editor) return;
 
     if (name) {
-      const data = editor.store.getSnapshot();
-      localStorage.setItem(`tldraw-strat:${name}`, JSON.stringify(data));
+      localStorage.setItem(
+        PERSISTENCE_KEY,
+        JSON.stringify(getSnapshot(editor.store))
+      );
       alert(`Strat "${name}" updated!`);
       return;
     }
@@ -19,8 +22,10 @@ const SaveCanvasButton = () => {
     const fallbackName = prompt("Enter a name for your strat:");
     if (!fallbackName) return;
 
-    const data = editor.store.getSnapshot();
-    localStorage.setItem(`tldraw-strat:${fallbackName}`, JSON.stringify(data));
+    localStorage.setItem(
+      `tldraw-strat:${fallbackName}`,
+      JSON.stringify(getSnapshot(editor.store))
+    );
     alert(`Strat "${fallbackName}" saved!`);
   };
 

@@ -8,8 +8,8 @@ const SavedCanvasesPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const keys = Object.keys(localStorage).filter((key) =>
-      key.startsWith("tldraw-strat:")
+    const keys = Object.keys(localStorage).filter(
+      (key) => key.startsWith("tldraw-strat:") && !key.endsWith("default")
     );
     setSavedCanvases(keys);
   }, []);

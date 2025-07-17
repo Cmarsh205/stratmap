@@ -1,10 +1,20 @@
-import { Tldraw, createTLStore, defaultShapeUtils } from "tldraw";
+import {
+  Tldraw,
+  createTLStore,
+  defaultShapeUtils,
+  getSnapshot,
+  loadSnapshot,
+  DefaultSpinner,
+} from "tldraw";
 import "tldraw/tldraw.css";
+
 import MapDropdown from "@/components/MapAndFloorMenu";
 import OperatorSidebar from "@/components/OperatorIconMenu";
 import SaveCanvasButton from "@/components/SaveBtn";
-import { useMemo } from "react";
+
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { throttle } from "lodash";
 
 declare global {
   interface Window {
@@ -14,31 +24,82 @@ declare global {
 
 const Stratmaker = () => {
   const { name } = useParams();
-  const store = useMemo(
-    () => createTLStore({ shapeUtils: defaultShapeUtils }),
-    []
-  );
+  const PERSISTENCE_KEY = `tldraw-strat:${name ?? "default"}`;
+  const [canvasKey, setCanvasKey] = useState(0);
+
+  const store = useMemo(() => {
+    return createTLStore({ shapeUtils: defaultShapeUtils });
+  }, [canvasKey]);
+
+  const [loadingState, setLoadingState] = useState<
+    | { status: "loading" }
+    | { status: "ready" }
+    | { status: "error"; error: string }
+  >({ status: "loading" });
+
+  const editorRef = useRef<any>(null);
+
+  useLayoutEffect(() => {
+    setLoadingState({ status: "loading" });
+
+    const saved = localStorage.getItem(PERSISTENCE_KEY);
+    if (saved) {
+      try {
+        const snapshot = JSON.parse(saved);
+        loadSnapshot(store, snapshot);
+        setLoadingState({ status: "ready" });
+      } catch (err: any) {
+        console.error("Error loading snapshot:", err);
+        setLoadingState({ status: "error", error: err.message });
+      }
+    } else {
+      setLoadingState({ status: "ready" });
+    }
+
+    const cleanup = store.listen(
+      throttle(() => {
+        const snapshot = getSnapshot(store);
+        localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(snapshot));
+      }, 500)
+    );
+
+    return () => cleanup();
+  }, [PERSISTENCE_KEY, store]);
 
   const handleMount = (editor: any) => {
+    editorRef.current = editor;
     window.__tldraw_editor = editor;
+  };
 
-    if (name) {
-      const key = `tldraw-strat:${name}`;
-      const saved = localStorage.getItem(key);
-
-      if (saved) {
-        try {
-          const data = JSON.parse(saved);
-          console.log("✅ Loading strat:", name, data);
-          editor.store.loadSnapshot(data);
-        } catch (error) {
-          console.error("❌ Failed to parse saved strat data:", error);
-        }
-      } else {
-        console.warn("⚠️ No saved strat found for:", key);
-      }
+  const handleResetCanvas = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to clear this strat and start over?"
+      )
+    ) {
+      localStorage.removeItem(PERSISTENCE_KEY);
+      setCanvasKey((prev) => prev + 1);
     }
   };
+
+  if (loadingState.status === "loading") {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <DefaultSpinner />
+      </div>
+    );
+  }
+
+  if (loadingState.status === "error") {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl text-red-500">Error loading strat</h2>
+          <p>{loadingState.error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -96,13 +157,19 @@ const Stratmaker = () => {
       }}
       onDragOver={(e) => e.preventDefault()}
     >
-      <Tldraw store={store} onMount={handleMount}>
+      <Tldraw key={canvasKey} store={store} onMount={handleMount}>
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
           <MapDropdown />
         </div>
 
-        <div className="absolute bottom-4 right-[20%] z-50">
+        <div className="absolute bottom-4 right-[20%] z-50 flex gap-2">
           <SaveCanvasButton />
+          <button
+            onClick={handleResetCanvas}
+            className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-500"
+          >
+            Reset
+          </button>
         </div>
       </Tldraw>
 
