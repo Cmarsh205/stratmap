@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import "../App.css";
 
 const Landing: React.FC = () => {
@@ -7,7 +9,11 @@ const Landing: React.FC = () => {
       <header className="landing-header">
         <h1>Welcome to StratMap</h1>
         <p>Your strategic mapping solution</p>
-        <button>Get Started</button>
+        <Button asChild variant="custom" size="lg">
+          <Link to="/stratmaker" className="!text-black !px-4">
+            Get Started
+          </Link>
+        </Button>
       </header>
     </div>
   );
