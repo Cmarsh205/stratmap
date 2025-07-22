@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/ui/sidebar";
 import Landing from "./pages/landing";
 import Stratmaker from "./pages/stratmaker";
@@ -9,7 +9,7 @@ const Settings = () => <div className="p-4">Settings Page</div>;
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-4">
@@ -23,7 +23,7 @@ const App: React.FC = () => {
           </Routes>
         </main>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
