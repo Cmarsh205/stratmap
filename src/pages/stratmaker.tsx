@@ -15,6 +15,7 @@ import SaveCanvasButton from "@/components/SaveBtn";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { throttle } from "lodash";
+import { Trash } from "lucide-react";
 
 declare global {
   interface Window {
@@ -162,12 +163,13 @@ const Stratmaker = () => {
           <MapDropdown />
         </div>
 
-        <div className="absolute bottom-4 right-[20%] z-50 flex gap-2">
+        <div className="absolute bottom-4 right-[12%] z-50 flex gap-2">
           <SaveCanvasButton />
           <button
             onClick={handleResetCanvas}
-            className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-500"
+            className="!bg-red-600 text-white !px-4 !rounded-md hover:!bg-red-500 flex items-center"
           >
+            <Trash className="!mr-2 h-4 w-4 text-inherit transition-colors" />
             Reset
           </button>
         </div>
