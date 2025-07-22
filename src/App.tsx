@@ -9,7 +9,7 @@ const Settings = () => <div className="p-4">Settings Page</div>;
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter basename="/stratmap">
+    <BrowserRouter basename="/stratmap/">
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-4">
