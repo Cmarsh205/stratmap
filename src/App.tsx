@@ -3,9 +3,7 @@ import Sidebar from "./components/ui/sidebar";
 import Landing from "./pages/landing";
 import Stratmaker from "./pages/stratmaker";
 import SavedCanvasesPage from "./pages/strats";
-
-const Dashboard = () => <div className="p-4">Dashboard Page</div>;
-const Settings = () => <div className="p-4">Settings Page</div>;
+import SettingsPage from "./pages/settings";
 
 const App: React.FC = () => {
   return (
@@ -15,8 +13,7 @@ const App: React.FC = () => {
         <main className="flex-1 p-4">
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/stratmaker" element={<Stratmaker />} />
             <Route path="/strats" element={<SavedCanvasesPage />} />
             <Route path="/strats/:name" element={<Stratmaker />} />

@@ -162,14 +162,14 @@ const MapDropdown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="bg-[#1E293B] text-yellow-400 hover:bg-[#334155] hover:text-yellow-300 flex items-center gap-2 px-4 py-2 rounded-md shadow group">
+        <Button className="!bg-gray-800 !text-yellow-400 hover:!bg-[#334155] hover:!text-yellow-300 flex items-center gap-2 !px-3 py-2 !rounded-md shadow group">
           <Map className="w-4 h-4 text-yellow-400 group-hover:text-yellow-300" />
           Choose Map
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="bg-[#1E293B] border border-slate-700 text-yellow-300 w-56 max-h-96 overflow-y-auto shadow-lg"
+        className="bg-gray-800 border border-slate-700 text-yellow-300 w-56 max-h-96 overflow-y-auto shadow-lg"
         sideOffset={8}
       >
         <DropdownMenuLabel className="text-yellow-400 font-bold text-sm px-2 py-1">
@@ -182,7 +182,7 @@ const MapDropdown = () => {
             <DropdownMenuSubTrigger className="text-yellow-200 hover:bg-[#334155] px-2 py-1">
               {mapName}
             </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="bg-[#1E293B] text-yellow-200 border-slate-700">
+            <DropdownMenuSubContent className="bg-gray-800 text-yellow-200 border-slate-700">
               {floors.map((floor) => (
                 <DropdownMenuItem
                   key={floor.label}

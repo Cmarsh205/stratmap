@@ -27,42 +27,48 @@ const SavedCanvasesPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800">Saved Strats</h1>
+    <div className="!min-h-screen !bg-gray-800 !p-8">
+      <div className="max-w-4xl !mx-auto">
+        <h1 className="!text-3xl !font-bold !text-yellow-400 !mb-6">
+          Saved Strats
+        </h1>
 
-      {savedCanvases.length === 0 ? (
-        <p className="text-gray-500">No saved strats found.</p>
-      ) : (
-        <ul className="space-y-4">
-          {savedCanvases.map((key) => {
-            const name = key.replace("tldraw-strat:", "");
-            return (
-              <li
-                key={key}
-                className="flex items-center justify-between bg-gray-100 p-4 rounded shadow"
-              >
-                <span className="font-medium text-gray-700">{name}</span>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => handleLoad(key)}
-                    className="bg-blue-600 text-white hover:bg-blue-500 px-3 py-1 flex items-center gap-1"
-                  >
-                    <Eye className="w-4 h-4" />
-                    Load
-                  </Button>
-                  <Button
-                    onClick={() => handleDelete(key)}
-                    className="bg-red-600 text-white hover:bg-red-500 px-3 py-1 flex items-center gap-1"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                  </Button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+        {savedCanvases.length === 0 ? (
+          <p className="text-gray-400">No saved strats found.</p>
+        ) : (
+          <ul className="space-y-4">
+            {savedCanvases.map((key) => {
+              const name = key.replace("tldraw-strat:", "");
+              return (
+                <li
+                  key={key}
+                  className="bg-gray-700 !rounded-xl !shadow-lg !p-3 !mb-4 !flex !items-center !justify-between !transition hover:!shadow-xl"
+                >
+                  <span className="!text-lg !font-semibold !text-yellow-400 !truncate !max-w-[60%]">
+                    {name}
+                  </span>
+                  <div className="!flex !gap-2">
+                    <Button
+                      onClick={() => handleLoad(key)}
+                      className="!bg-yellow-400 !text-gray-900 hover:!bg-yellow-300 !px-3 !py-2 !rounded-lg !flex !items-center !gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Load
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(key)}
+                      className="!bg-red-600 !text-white hover:!bg-red-500 !px-3 !py-2 !rounded-lg !flex !items-center !gap-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </Button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

@@ -32,7 +32,7 @@ const SaveCanvasButton = () => {
   return (
     <Button
       onClick={handleSave}
-      className="!bg-[#1E293B] !text-yellow-400 hover:!bg-[#334155] hover:!text-yellow-300 flex items-center !px-3 !rounded-md shadow group"
+      className="!bg-gray-800 !text-yellow-400 hover:!bg-[#334155] hover:!text-yellow-300 flex items-center !px-3 !rounded-md shadow group"
     >
       <Save className="w-4 h-4 text-yellow-400 group-hover:text-yellow-300" />
       Save

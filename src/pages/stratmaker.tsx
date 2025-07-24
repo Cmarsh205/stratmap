@@ -167,7 +167,7 @@ const Stratmaker = () => {
           <SaveCanvasButton />
           <button
             onClick={handleResetCanvas}
-            className="!bg-red-600 text-white !px-4 !rounded-md hover:!bg-red-500 flex items-center"
+            className="!bg-red-600 !text-white !px-3 !rounded-md hover:!bg-red-500 flex items-center"
           >
             <Trash className="!mr-2 h-4 w-4 text-inherit transition-colors" />
             Reset

@@ -13,7 +13,7 @@ import logo from "../../assets/LogoSB.png";
 
 const Sidebar = () => {
   return (
-    <aside className="h-screen w-60 bg-gray-900 text-white flex flex-col justify-between shadow-lg">
+    <aside className="h-screen w-60.25 bg-gray-900 text-white flex flex-col justify-between shadow-lg">
       <div>
         <div className="flex justify-center py-8">
           <img

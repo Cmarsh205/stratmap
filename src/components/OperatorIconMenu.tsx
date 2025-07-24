@@ -20,14 +20,14 @@ const OperatorSidebar = () => {
 
   return (
     <div
-      className={`fixed top-5 left-60 h-[98%] max-h-[100%] bg-white border-r z-50 shadow-md flex flex-col items-center pt-4 transition-all duration-300 ease-in-out ${
+      className={`fixed top left-60 h-[100%] max-h-[100%] bg-gray-800 border-r z-50 shadow-md flex flex-col items-center !pt-8 transition-all duration-300 ease-in-out ${
         collapsed ? "w-0" : "w-35"
       }`}
     >
       <Button
         variant="ghost"
         size="sm"
-        className="absolute -right-4.5 top-1/2 -translate-y-1/2 rounded-full shadow-md p-1"
+        className="absolute -right-4 top-1/2 -translate-y-1/2 rounded-full shadow-md p-1 !bg-yellow-400 !text-gray-800"
         onClick={toggleCollapsed}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
@@ -35,12 +35,12 @@ const OperatorSidebar = () => {
       </Button>
 
       {!collapsed && (
-        <div className="flex-grow flex flex-col justify-center w-full px-4 overflow-y-auto">
+        <div className="flex-grow flex flex-col justify-center w-full !px-3 !overflow-y-auto">
           <section className="text-center mb-12">
-            <h2 className="font-extrabold text-xl mb-6 border-b-2 border-yellow-500 pb-2">
+            <h2 className="!font-extrabold !text-xl !mb-5 !border-b-2 !border-red-600 !pb-2 text-yellow-400">
               Attackers
             </h2>
-            <div className="grid grid-cols-3 gap-3 justify-center">
+            <div className="grid grid-cols-3 gap-2 justify-center">
               {attackers.map((op) => (
                 <img
                   key={op.id}
@@ -49,17 +49,17 @@ const OperatorSidebar = () => {
                   title={op.name}
                   draggable
                   onDragStart={(e) => handleDragStart(e, getIconPath(op.id))}
-                  className="w-12 h-12 rounded-lg shadow hover:scale-110 transition-transform cursor-grab mx-auto p-0.5 bg-gray-50"
+                  className="w-12 h-12 rounded-lg shadow hover:scale-110 transition-transform cursor-grab mx-auto p-0.5 bg-[#888888]"
                 />
               ))}
             </div>
           </section>
 
           <section className="text-center">
-            <h2 className="font-extrabold text-xl mb-6 border-b-2 border-blue-600 pb-2">
+            <h2 className="!font-extrabold !text-xl !mb-5 !mt-5 !border-b-2 !border-blue-600 !pb-2 text-yellow-400">
               Defenders
             </h2>
-            <div className="grid grid-cols-3 gap-3 justify-center">
+            <div className="grid grid-cols-3 gap-2 justify-center">
               {defenders.map((op) => (
                 <img
                   key={op.id}
@@ -68,7 +68,7 @@ const OperatorSidebar = () => {
                   title={op.name}
                   draggable
                   onDragStart={(e) => handleDragStart(e, getIconPath(op.id))}
-                  className="w-12 h-12 rounded-lg shadow hover:scale-110 transition-transform cursor-grab mx-auto p-0.5 bg-gray-50"
+                  className="w-12 h-12 rounded-lg shadow hover:scale-150 transition-transform cursor-grab p-0.5 bg-[#888888]"
                 />
               ))}
             </div>
