@@ -117,8 +117,6 @@ const Stratmaker = () => {
 
           const assetId = `asset:${crypto.randomUUID()}`;
           const shapeId = `shape:${crypto.randomUUID()}`;
-          const width = 80;
-          const height = 80;
 
           editor.updateAssets([
             {
@@ -129,8 +127,8 @@ const Stratmaker = () => {
                 name: "Operator",
                 src: iconUrl,
                 mimeType: "image/png",
-                w: width,
-                h: height,
+                w: 20,
+                h: 20,
                 isAnimated: false,
               },
               meta: {},
@@ -145,8 +143,8 @@ const Stratmaker = () => {
               y: mousePoint.y,
               props: {
                 assetId,
-                w: width,
-                h: height,
+                w: 20,
+                h: 20,
                 crop: {
                   topLeft: { x: 0, y: 0 },
                   bottomRight: { x: 1, y: 1 },

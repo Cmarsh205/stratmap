@@ -113,11 +113,15 @@ const MapDropdown = () => {
   const insertImage = (url: string) => {
     if (!editor) return;
 
+    const viewportBounds = editor.getViewportPageBounds();
+    const viewportWidth = viewportBounds.width;
+    const viewportHeight = viewportBounds.height;
+
+    const width = viewportWidth * 0.8;
+    const height = viewportHeight * 0.8;
+
     const assetId = `asset:${crypto.randomUUID()}` as TLAssetId;
     const shapeId = `shape:${crypto.randomUUID()}` as TLShapeId;
-
-    const width = 300;
-    const height = 300;
 
     editor.updateAssets([
       {
@@ -140,12 +144,15 @@ const MapDropdown = () => {
       },
     ]);
 
+    const centerX = viewportBounds.minX + (viewportWidth - width) / 2;
+    const centerY = viewportBounds.minY + (viewportHeight - height) / 2;
+
     editor.createShapes([
       {
         id: shapeId,
         type: "image",
-        x: 100,
-        y: 100,
+        x: centerX,
+        y: centerY,
         props: {
           assetId,
           w: width,
