@@ -1,4 +1,5 @@
 import { useEditor } from "tldraw";
+import { useState } from "react";
 import type { TLAssetId, TLShapeId } from "tldraw";
 import {
   DropdownMenu,
@@ -12,6 +13,13 @@ import {
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Map } from "lucide-react";
 
 const imageCategories = {
@@ -107,11 +115,24 @@ const imageCategories = {
   ],
 };
 
-const MapDropdown = () => {
+interface MapDropdownProps {
+  onMapChange?: (mapUrl: string) => void;
+}
+
+const MapDropdown = ({ onMapChange }: MapDropdownProps) => {
   const editor = useEditor();
+  const [pendingMap, setPendingMap] = useState<string | null>(null);
+  const [showWarning, setShowWarning] = useState(false);
 
   const insertImage = (url: string) => {
     if (!editor) return;
+
+    const shapes = editor.getCurrentPageShapes();
+    shapes.forEach((shape: any) => {
+      if (shape.type === "image" && shape.props?.name === "map") {
+        editor.deleteShapes([shape.id]);
+      }
+    });
 
     const viewportBounds = editor.getViewportPageBounds();
     const viewportWidth = viewportBounds.width;
@@ -164,46 +185,93 @@ const MapDropdown = () => {
         },
       },
     ]);
+
+    if (onMapChange) {
+      onMapChange(url);
+    }
+  };
+
+  const handleSelectMap = (url: string) => {
+    setPendingMap(url);
+    setShowWarning(true);
+  };
+
+  const confirmMapChange = () => {
+    if (pendingMap) {
+      insertImage(pendingMap);
+    }
+    setPendingMap(null);
+    setShowWarning(false);
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button className="!bg-gray-800 !text-yellow-400 hover:!bg-[#334155] hover:!text-yellow-300 flex items-center gap-2 !px-3 py-2 !rounded-md shadow group">
-          <Map className="w-4 h-4 text-yellow-400 group-hover:text-yellow-300" />
-          Choose Map
-        </Button>
-      </DropdownMenuTrigger>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button className="!bg-gray-800 !text-yellow-400 hover:!bg-[#334155] hover:!text-yellow-300 flex items-center gap-2 !px-3 py-2 !rounded-md shadow group">
+            <Map className="w-4 h-4 text-yellow-400 group-hover:text-yellow-300" />
+            Choose Map
+          </Button>
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        className="bg-gray-800 border border-slate-700 text-yellow-300 w-56 max-h-96 overflow-y-auto shadow-lg"
-        sideOffset={8}
-      >
-        <DropdownMenuLabel className="text-yellow-400 font-bold text-sm px-2 py-1">
-          Select Map & Floor
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-slate-600" />
+        <DropdownMenuContent
+          className="bg-gray-800 border border-slate-700 text-yellow-300 w-56 max-h-96 overflow-y-auto shadow-lg"
+          sideOffset={8}
+        >
+          <DropdownMenuLabel className="text-yellow-400 font-bold text-sm px-2 py-1">
+            Select Map & Floor
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-slate-600" />
 
-        {Object.entries(imageCategories).map(([mapName, floors]) => (
-          <DropdownMenuSub key={mapName}>
-            <DropdownMenuSubTrigger className="text-yellow-200 hover:bg-[#334155] px-2 py-1">
-              {mapName}
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="bg-gray-800 text-yellow-200 border-slate-700">
-              {floors.map((floor) => (
-                <DropdownMenuItem
-                  key={floor.label}
-                  onClick={() => insertImage(floor.src)}
-                  className="hover:bg-yellow-500 hover:text-slate-900 px-2 py-1 cursor-pointer"
-                >
-                  {floor.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          {Object.entries(imageCategories).map(([mapName, floors]) => (
+            <DropdownMenuSub key={mapName}>
+              <DropdownMenuSubTrigger className="text-yellow-200 hover:bg-[#334155] px-2 py-1">
+                {mapName}
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent className="bg-gray-800 text-yellow-200 border-slate-700">
+                {floors.map((floor) => (
+                  <DropdownMenuItem
+                    key={floor.label}
+                    onClick={() => handleSelectMap(floor.src)}
+                    className="hover:bg-yellow-500 hover:text-slate-900 px-2 py-1 cursor-pointer"
+                  >
+                    {floor.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={showWarning} onOpenChange={setShowWarning}>
+        <DialogContent className="bg-gray-800 text-yellow-300 border border-slate-700 rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-yellow-400 text-lg">
+              Warning
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm mb-4">
+            Changing the map will clear the current strat. Make sure to save
+            your work first.
+          </p>
+          <DialogFooter className="flex justify-end gap-2">
+            <Button
+              onClick={() => setShowWarning(false)}
+              className="!bg-gray-600 hover:!bg-gray-500 text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmMapChange}
+              className="!bg-red-600 hover:!bg-red-500 text-white"
+            >
+              Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

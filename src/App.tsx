@@ -4,6 +4,7 @@ import Landing from "./pages/landing";
 import Stratmaker from "./pages/stratmaker";
 import SavedCanvasesPage from "./pages/strats";
 import SettingsPage from "./pages/settings";
+import MapsPage from "./pages/maps";
 
 const App: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
             <Route path="/stratmaker" element={<Stratmaker />} />
             <Route path="/strats" element={<SavedCanvasesPage />} />
             <Route path="/strats/:name" element={<Stratmaker />} />
+            <Route path="/maps" element={<MapsPage />} />
           </Routes>
         </main>
       </div>

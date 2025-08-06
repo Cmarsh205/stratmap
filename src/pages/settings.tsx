@@ -10,6 +10,10 @@ const SettingsPage = () => {
           Settings
         </h1>
 
+        <h3 className="!text-2xl !font-bold !text-red-600 !mb-6">
+          *This is a placeholder page*
+        </h3>
+
         <div className="bg-gray-700 !p-6 !rounded-xl !shadow-lg !space-y-6">
           <div>
             <label className="!block !text-sm !font-medium !text-gray-300 !mb-2">

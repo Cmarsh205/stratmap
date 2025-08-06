@@ -13,7 +13,7 @@ import OperatorSidebar from "@/components/OperatorIconMenu";
 import SaveCanvasButton from "@/components/SaveBtn";
 
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { throttle } from "lodash";
 import { Trash } from "lucide-react";
 
@@ -25,6 +25,7 @@ declare global {
 
 const Stratmaker = () => {
   const { name } = useParams();
+  const location = useLocation();
   const PERSISTENCE_KEY = `tldraw-strat:${name ?? "default"}`;
   const [canvasKey, setCanvasKey] = useState(0);
 
@@ -39,6 +40,7 @@ const Stratmaker = () => {
   >({ status: "loading" });
 
   const editorRef = useRef<any>(null);
+  const mapImageRef = useRef<string | null>(null);
 
   useLayoutEffect(() => {
     setLoadingState({ status: "loading" });
@@ -46,7 +48,9 @@ const Stratmaker = () => {
     const saved = localStorage.getItem(PERSISTENCE_KEY);
     if (saved) {
       try {
-        const snapshot = JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        const snapshot = parsed.snapshot || parsed;
+        mapImageRef.current = parsed.mapThumbnail || null;
         loadSnapshot(store, snapshot);
         setLoadingState({ status: "ready" });
       } catch (err: any) {
@@ -60,7 +64,11 @@ const Stratmaker = () => {
     const cleanup = store.listen(
       throttle(() => {
         const snapshot = getSnapshot(store);
-        localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(snapshot));
+        const saveData = {
+          snapshot,
+          mapThumbnail: mapImageRef.current,
+        };
+        localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(saveData));
       }, 500)
     );
 
@@ -70,6 +78,68 @@ const Stratmaker = () => {
   const handleMount = (editor: any) => {
     editorRef.current = editor;
     window.__tldraw_editor = editor;
+
+    const params = new URLSearchParams(location.search);
+    const mapImage = params.get("map");
+
+    if (mapImage) {
+      mapImageRef.current = mapImage;
+
+      const shapes = editor.getCurrentPageShapes();
+      shapes.forEach((shape: any) => {
+        if (shape.type === "image" && shape.props?.name === "Map Background") {
+          editor.deleteShapes([shape.id]);
+        }
+      });
+
+      const viewportBounds = editor.getViewportPageBounds();
+      const viewportWidth = viewportBounds.width;
+      const viewportHeight = viewportBounds.height;
+
+      const width = viewportWidth * 0.8;
+      const height = viewportHeight * 0.8;
+
+      const assetId = `asset:${crypto.randomUUID()}`;
+      const shapeId = `shape:${crypto.randomUUID()}`;
+
+      editor.updateAssets([
+        {
+          id: assetId,
+          type: "image",
+          typeName: "asset",
+          props: {
+            name: "Map Background",
+            src: mapImage,
+            mimeType: "image/png",
+            w: width,
+            h: height,
+            isAnimated: false,
+          },
+          meta: {},
+        },
+      ]);
+
+      const centerX = viewportBounds.minX + (viewportWidth - width) / 2;
+      const centerY = viewportBounds.minY + (viewportHeight - height) / 2;
+
+      editor.createShapes([
+        {
+          id: shapeId,
+          type: "image",
+          x: centerX,
+          y: centerY,
+          props: {
+            assetId,
+            w: width,
+            h: height,
+            crop: {
+              topLeft: { x: 0, y: 0 },
+              bottomRight: { x: 1, y: 1 },
+            },
+          },
+        },
+      ]);
+    }
   };
 
   const handleResetCanvas = () => {
@@ -158,16 +228,21 @@ const Stratmaker = () => {
     >
       <Tldraw key={canvasKey} store={store} onMount={handleMount}>
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
-          <MapDropdown />
+          <MapDropdown
+            onMapChange={(mapUrl) => {
+              mapImageRef.current = mapUrl;
+              console.log("Map image updated:", mapUrl);
+            }}
+          />
         </div>
 
         <div className="absolute bottom-4 right-[12%] z-50 flex gap-2">
-          <SaveCanvasButton />
+          <SaveCanvasButton store={store} mapImageRef={mapImageRef} />
           <button
             onClick={handleResetCanvas}
-            className="!bg-red-600 !text-white !px-3 !rounded-md hover:!bg-red-500 flex items-center"
+            className="!bg-red-600 !text-black !px-3 !rounded-md hover:!bg-red-500 !flex !items-center !gap-2"
           >
-            <Trash className="!mr-2 h-4 w-4 text-inherit transition-colors" />
+            <Trash className="mr-2 h-4 w-4" />
             Reset
           </button>
         </div>

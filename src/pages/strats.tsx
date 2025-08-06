@@ -3,15 +3,40 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+interface SavedStrat {
+  key: string;
+  name: string;
+  thumbnail?: string;
+}
+
 const SavedCanvasesPage = () => {
-  const [savedCanvases, setSavedCanvases] = useState<string[]>([]);
+  const [savedCanvases, setSavedCanvases] = useState<SavedStrat[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const keys = Object.keys(localStorage).filter(
       (key) => key.startsWith("tldraw-strat:") && !key.endsWith("default")
     );
-    setSavedCanvases(keys);
+
+    const canvases: SavedStrat[] = keys.map((key) => {
+      const name = key.replace("tldraw-strat:", "");
+      let thumbnail: string | undefined;
+
+      try {
+        const savedData = JSON.parse(localStorage.getItem(key) || "{}");
+        thumbnail = savedData?.meta?.mapImage || undefined;
+        console.log(
+          "Loaded savedData.meta.mapImage =",
+          savedData?.meta?.mapImage
+        );
+      } catch {
+        thumbnail = undefined;
+      }
+
+      return { key, name, thumbnail };
+    });
+
+    setSavedCanvases(canvases);
   }, []);
 
   const handleLoad = (key: string) => {
@@ -22,50 +47,62 @@ const SavedCanvasesPage = () => {
   const handleDelete = (key: string) => {
     if (confirm("Are you sure you want to delete this strat?")) {
       localStorage.removeItem(key);
-      setSavedCanvases((prev) => prev.filter((k) => k !== key));
+      setSavedCanvases((prev) => prev.filter((c) => c.key !== key));
     }
   };
 
   return (
     <div className="!min-h-screen !bg-gray-800 !p-8">
-      <div className="max-w-4xl !mx-auto">
+      <div className="!max-w-4xl !mx-auto">
         <h1 className="!text-3xl !font-bold !text-yellow-400 !mb-6">
           Saved Strats
         </h1>
 
         {savedCanvases.length === 0 ? (
-          <p className="text-gray-400">No saved strats found.</p>
+          <p className="!text-gray-400">No saved strats found.</p>
         ) : (
-          <ul className="space-y-4">
-            {savedCanvases.map((key) => {
-              const name = key.replace("tldraw-strat:", "");
-              return (
-                <li
-                  key={key}
-                  className="bg-gray-700 !rounded-xl !shadow-lg !p-3 !mb-4 !flex !items-center !justify-between !transition hover:!shadow-xl"
-                >
-                  <span className="!text-lg !font-semibold !text-yellow-400 !truncate !max-w-[60%]">
+          <ul className="!space-y-4">
+            {savedCanvases.map(({ key, name, thumbnail }) => (
+              <li
+                key={key}
+                className="!bg-gray-700 !rounded-xl !shadow-lg !p-3 !flex !items-center !justify-between !gap-4 hover:!shadow-xl !transition"
+              >
+                <div className="!flex !items-center !gap-4 !flex-1 !min-w-0">
+                  {thumbnail ? (
+                    <img
+                      src={thumbnail}
+                      alt={`${name} thumbnail`}
+                      className="!w-20 !h-14 !object-cover !rounded-md !border !border-gray-600"
+                    />
+                  ) : (
+                    <div className="!w-20 !h-14 !bg-gray-600 !rounded-md !flex !items-center !justify-center !text-gray-400 !text-xs !border !border-gray-500">
+                      No Map
+                    </div>
+                  )}
+
+                  <span className="!text-lg !font-semibold !text-yellow-400 !truncate">
                     {name}
                   </span>
-                  <div className="!flex !gap-2">
-                    <Button
-                      onClick={() => handleLoad(key)}
-                      className="!bg-yellow-400 !text-gray-900 hover:!bg-yellow-300 !px-3 !py-2 !rounded-lg !flex !items-center !gap-2"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Load
-                    </Button>
-                    <Button
-                      onClick={() => handleDelete(key)}
-                      className="!bg-red-600 !text-white hover:!bg-red-500 !px-3 !py-2 !rounded-lg !flex !items-center !gap-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete
-                    </Button>
-                  </div>
-                </li>
-              );
-            })}
+                </div>
+
+                <div className="!flex !gap-2 !flex-shrink-0">
+                  <Button
+                    onClick={() => handleLoad(key)}
+                    className="!bg-yellow-400 !text-gray-900 hover:!bg-yellow-300 !px-3 !py-2 !rounded-lg !flex !items-center !gap-2"
+                  >
+                    <Eye className="!w-4 !h-4" />
+                    Load
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete(key)}
+                    className="!bg-red-600 !text-black hover:!bg-red-500 !px-3 !py-2 !rounded-lg !flex !items-center !gap-2"
+                  >
+                    <Trash2 className="!w-4 !h-4" />
+                    Delete
+                  </Button>
+                </div>
+              </li>
+            ))}
           </ul>
         )}
       </div>
