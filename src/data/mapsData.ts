@@ -1,7 +1,7 @@
 export const mapsData = [
     {
       name: "Bank",
-      thumbnail: "/thumbnails/Bank_Thumbnail.webp",
+      thumbnail: "/thumbnails/bank.webp",
       floors: [
         { name: "Basement", image: "/maps/Bank/basement.jpg" },
         { name: "First Floor", image: "/maps/Bank/floor1.jpg" },
@@ -11,7 +11,7 @@ export const mapsData = [
     },
     {
         name: "Border",
-        thumbnail: "/thumbnails/Border_Thumbnail.webp",
+        thumbnail: "/thumbnails/border.webp",
         floors: [
           { name: "First Floor", image: "/maps/Border/floor1.jpg" },
           { name: "Second Floor", image: "/maps/Border/floor2.jpg" },
@@ -20,7 +20,7 @@ export const mapsData = [
       },
       {
         name: "Chalet",
-        thumbnail: "/thumbnails/Chalet_Thumbnail.webp",
+        thumbnail: "/thumbnails/chalet.webp",
         floors: [
           { name: "Basement", image: "/maps/Chalet/basement.jpg" },
           { name: "First Floor", image: "/maps/Chalet/floor1.jpg" },
@@ -30,7 +30,7 @@ export const mapsData = [
       },
       {
         name: "Clubhouse",
-        thumbnail: "/thumbnails/Clubhouse_Thumbnail.webp",
+        thumbnail: "/thumbnails/clubhouse.webp",
         floors: [
           { name: "Basement", image: "/maps/Clubhouse/basement.jpg" },
           { name: "First Floor", image: "/maps/Clubhouse/floor1.jpg" },
@@ -40,7 +40,7 @@ export const mapsData = [
       },
       {
       name: "Coastline",
-      thumbnail: "/thumbnails/Coastline_Thumbnail.webp",
+      thumbnail: "/thumbnails/coastline.webp",
       floors: [
         { name: "First Floor", image: "/maps/Coastline/floor1.jpg" },
         { name: "Second Floor", image: "/maps/Coastline/floor2.jpg" },
@@ -49,7 +49,7 @@ export const mapsData = [
     },
     {
         name: "Consulate",
-        thumbnail: "/thumbnails/Consulate_Thumbnail.webp",
+        thumbnail: "/thumbnails/consulate.webp",
         floors: [
           { name: "Basement", image: "/maps/Consulate/basement.jpg" },
           { name: "First Floor", image: "/maps/Consulate/floor1.jpg" },
@@ -59,7 +59,7 @@ export const mapsData = [
       },
       {
         name: "Emerald Plains",
-        thumbnail: "/thumbnails/Emerald_Plains_Thumbnail.webp",
+        thumbnail: "/thumbnails/emerald plains.webp",
         floors: [
           { name: "First Floor", image: "/maps/Emerald Plains/floor1.jpg" },
           { name: "Second Floor", image: "/maps/Emerald Plains/floor2.jpg" },
@@ -68,7 +68,7 @@ export const mapsData = [
       },
       {
         name: "Kafe",
-        thumbnail: "/thumbnails/Kafe_Thumbnail.webp",
+        thumbnail: "/thumbnails/kafe.webp",
         floors: [
           { name: "First Floor", image: "/maps/Kafe/floor1.jpg" },
           { name: "Second Floor", image: "/maps/Kafe/floor2.jpg" },
@@ -78,7 +78,7 @@ export const mapsData = [
       },
       {
         name: "Kanal",
-        thumbnail: "/thumbnails/Kanal_Thumbnail.webp",
+        thumbnail: "/thumbnails/kanal.webp",
         floors: [
           { name: "Basement", image: "/maps/Kanal/basement.jpg" },
           { name: "First Floor", image: "/maps/Kanal/floor1.jpg" },
@@ -88,7 +88,7 @@ export const mapsData = [
       },
       {
         name: "Lair",
-        thumbnail: "/thumbnails/Lair_Thumbnail.webp",
+        thumbnail: "/thumbnails/lair.webp",
         floors: [
           { name: "Basement", image: "/maps/Lair/basement.jpg" },
           { name: "First Floor", image: "/maps/Lair/floor1.jpg" },
@@ -98,7 +98,7 @@ export const mapsData = [
       },     
       {
         name: "Nighthaven Labs",
-        thumbnail: "/thumbnails/NH_Labs_Thumbnail.webp",
+        thumbnail: "/thumbnails/nighthaven labs.webp",
         floors: [
           { name: "Basement", image: "/maps/Nighthaven Labs/basement.jpg" },
           { name: "First Floor", image: "/maps/Nighthaven Labs/floor1.jpg" },
@@ -108,7 +108,7 @@ export const mapsData = [
       },
       {
         name: "Oregon",
-        thumbnail: "/thumbnails/Oregon_Thumbnail.webp",
+        thumbnail: "/thumbnails/oregon.webp",
         floors: [
           { name: "Basement", image: "/maps/Oregon/basement.jpg" },
           { name: "First Floor", image: "/maps/Oregon/floor1.jpg" },
@@ -118,7 +118,7 @@ export const mapsData = [
       },
       {
         name: "Outback",
-        thumbnail: "/thumbnails/Outback_Thumbnail.webp",
+        thumbnail: "/thumbnails/outback.webp",
         floors: [
           { name: "First Floor", image: "/maps/Outback/floor1.jpg" },
           { name: "Second Floor", image: "/maps/Outback/floor2.jpg" },
@@ -127,7 +127,7 @@ export const mapsData = [
       },
       {
         name: "Skyscraper",
-        thumbnail: "/thumbnails/Skyscraper_Thumbnail.webp",
+        thumbnail: "/thumbnails/skyscraper.webp",
         floors: [
           { name: "First Floor", image: "/maps/Skyscraper/floor1.jpg" },
           { name: "Second Floor", image: "/maps/Skyscraper/floor2.jpg" },
@@ -136,7 +136,7 @@ export const mapsData = [
       },
       {
         name: "Themepark",
-        thumbnail: "/thumbnails/Themepark_Thumbnail.webp",
+        thumbnail: "/thumbnails/themepark.webp",
         floors: [
           { name: "First Floor", image: "/maps/Themepark/floor1.jpg" },
           { name: "Second Floor", image: "/maps/Themepark/floor2.jpg" },
@@ -145,7 +145,7 @@ export const mapsData = [
       },
       {
         name: "Villa",
-        thumbnail: "/thumbnails/Villa_Thumbnail.webp",
+        thumbnail: "/thumbnails/villa.webp",
         floors: [
           { name: "Basement", image: "/maps/Villa/basement.jpg" },
           { name: "First Floor", image: "/maps/Villa/floor1.jpg" },

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { mapsData } from "@/data/mapsData";
 
 interface SavedStrat {
   key: string;
@@ -24,11 +25,16 @@ const SavedCanvasesPage = () => {
 
       try {
         const savedData = JSON.parse(localStorage.getItem(key) || "{}");
-        thumbnail = savedData?.meta?.mapImage || undefined;
-        console.log(
-          "Loaded savedData.meta.mapImage =",
-          savedData?.meta?.mapImage
+
+
+        const mapName =
+          savedData?.snapshot?.meta?.mapName || savedData?.mapName || null;
+
+        const mapEntry = mapsData.find(
+          (map) => map.name.toLowerCase() === mapName?.toLowerCase()
         );
+
+        thumbnail = mapEntry?.thumbnail;
       } catch {
         thumbnail = undefined;
       }

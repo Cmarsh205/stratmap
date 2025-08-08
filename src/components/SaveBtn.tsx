@@ -6,10 +6,10 @@ import { type RefObject } from "react";
 
 interface SaveCanvasButtonProps {
   store: any;
-  mapImageRef: RefObject<string | null>;
+  mapNameRef: RefObject<string | null>;
 }
 
-const SaveCanvasButton = ({ store, mapImageRef }: SaveCanvasButtonProps) => {
+const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
   const { name } = useParams();
   const navigate = useNavigate();
 
@@ -28,18 +28,22 @@ const SaveCanvasButton = ({ store, mapImageRef }: SaveCanvasButtonProps) => {
       const PERSISTENCE_KEY = `tldraw-strat:${saveName}`;
 
       const snapshot = getSnapshot(store) as TLEditorSnapshot & {
-        meta?: { mapImage?: string | null };
+        meta?: { mapImage?: string | null; mapName?: string | null };
       };
 
       snapshot.meta = {
         ...(snapshot.meta || {}),
-        mapImage: mapImageRef.current || snapshot.meta?.mapImage || null,
+        mapName: mapNameRef.current || snapshot.meta?.mapName || null,
       };
 
-      localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(snapshot));
+      const saveData = {
+        snapshot,
+        mapName: mapNameRef.current || snapshot.meta?.mapName || null,
+      };
+
+      localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(saveData));
 
       alert(`Strat "${saveName}" saved successfully!`);
-
       navigate(`/strats/${encodeURIComponent(saveName)}`);
     } catch (err) {
       console.error("Error saving strat:", err);
