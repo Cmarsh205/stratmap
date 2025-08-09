@@ -70,9 +70,14 @@ const Stratmaker = () => {
       throttle(() => {
         const snapshot = getSnapshot(store);
 
+        const existingData = JSON.parse(
+          localStorage.getItem(PERSISTENCE_KEY) || "{}"
+        );
+
         const saveData = {
           snapshot,
           mapName: mapNameRef.current,
+          savedAt: existingData.savedAt,
         };
 
         localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(saveData));

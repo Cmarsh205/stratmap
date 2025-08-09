@@ -39,6 +39,7 @@ const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
       const saveData = {
         snapshot,
         mapName: mapNameRef.current || snapshot.meta?.mapName || null,
+        savedAt: new Date().toISOString(),
       };
 
       localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(saveData));
