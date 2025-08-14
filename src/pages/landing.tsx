@@ -14,6 +14,7 @@ import {
   Award,
   CheckCircle,
 } from "lucide-react";
+import logo from "../assets/LogoSB.png";
 
 const Landing: React.FC = () => {
   const features = [
@@ -115,9 +116,9 @@ const Landing: React.FC = () => {
             {/* Logo */}
             <div className="!flex !items-center !justify-center !mx-auto !mb-8">
               <img
-                src="src\assets\LogoSB.png"
+                src={logo}
                 alt="StratMap Logo"
-                className="w-50"
+                className="w-50 !pt-7 !pb-7"
               />
             </div>
 
