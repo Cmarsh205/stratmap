@@ -213,7 +213,7 @@ const SavedCanvasesPage = () => {
                       className="!w-full !h-48 !object-cover !transition-transform !duration-500 group-hover:!scale-110"
                     />
                   ) : (
-                    <div className="!w-full h-40 !bg-gray-700 !flex !items-center !justify-center !text-gray-500 !text-sm">
+                    <div className="!w-full h-48 !bg-gray-700 !flex !items-center !justify-center !text-gray-500 !text-sm">
                       No Map Thumbnail
                     </div>
                   )}
