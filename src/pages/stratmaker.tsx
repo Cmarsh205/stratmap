@@ -12,8 +12,6 @@ import MapAndFloorMenu from "@/components/MapAndFloorMenu";
 import OperatorSidebar from "@/components/OperatorIconMenu";
 import SaveCanvasButton from "@/components/SaveBtn";
 
-import { mapsData } from "@/data/mapsData";
-
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { throttle } from "lodash";
@@ -53,9 +51,7 @@ const Stratmaker = () => {
       try {
         const parsed = JSON.parse(saved);
         const snapshot = parsed.snapshot || parsed;
-
         mapNameRef.current = snapshot?.meta?.mapName ?? parsed.mapName ?? null;
-
         loadSnapshot(store, snapshot);
         setLoadingState({ status: "ready" });
       } catch (err: any) {
@@ -69,7 +65,6 @@ const Stratmaker = () => {
     const cleanup = store.listen(
       throttle(() => {
         const snapshot = getSnapshot(store);
-
         const existingData = JSON.parse(
           localStorage.getItem(PERSISTENCE_KEY) || "{}"
         );
@@ -99,11 +94,8 @@ const Stratmaker = () => {
     });
 
     const viewportBounds = editor.getViewportPageBounds();
-    const viewportWidth = viewportBounds.width;
-    const viewportHeight = viewportBounds.height;
-
-    const width = viewportWidth * 0.8;
-    const height = viewportHeight * 0.8;
+    const width = viewportBounds.width * 0.8;
+    const height = viewportBounds.height * 0.8;
 
     const assetId = `asset:${crypto.randomUUID()}`;
     const shapeId = `shape:${crypto.randomUUID()}`;
@@ -129,8 +121,8 @@ const Stratmaker = () => {
       },
     ]);
 
-    const centerX = viewportBounds.minX + (viewportWidth - width) / 2;
-    const centerY = viewportBounds.minY + (viewportHeight - height) / 2;
+    const centerX = viewportBounds.minX + (viewportBounds.width - width) / 2;
+    const centerY = viewportBounds.minY + (viewportBounds.height - height) / 2;
 
     editor.createShapes([
       {
@@ -142,10 +134,7 @@ const Stratmaker = () => {
           assetId,
           w: width,
           h: height,
-          crop: {
-            topLeft: { x: 0, y: 0 },
-            bottomRight: { x: 1, y: 1 },
-          },
+          crop: { topLeft: { x: 0, y: 0 }, bottomRight: { x: 1, y: 1 } },
         },
       },
     ]);
@@ -154,82 +143,11 @@ const Stratmaker = () => {
   const handleMount = (editor: any) => {
     editorRef.current = editor;
     window.__tldraw_editor = editor;
+
     const params = new URLSearchParams(location.search);
-
     const mapNameFromQuery = params.get("map");
-    const mapName =
-      (mapNameFromQuery && mapNameFromQuery.trim()) || mapNameRef.current;
-
-    if (mapName && typeof mapName === "string") {
-      mapNameRef.current = mapName;
-
-      const mapObj = mapsData.find((m) => m.name === mapName);
-      const defaultFloorImage = mapObj?.floors?.[0]?.image;
-
-      if (defaultFloorImage) {
-        const shapes = editor.getCurrentPageShapes();
-        shapes.forEach((shape: any) => {
-          if (
-            shape.type === "image" &&
-            shape.props?.name === "Map Background"
-          ) {
-            editor.deleteShapes([shape.id]);
-          }
-        });
-
-        const viewportBounds = editor.getViewportPageBounds();
-        const viewportWidth = viewportBounds.width;
-        const viewportHeight = viewportBounds.height;
-
-        const width = viewportWidth * 0.8;
-        const height = viewportHeight * 0.8;
-
-        const assetId = `asset:${crypto.randomUUID()}`;
-        const shapeId = `shape:${crypto.randomUUID()}`;
-
-        editor.updateAssets([
-          {
-            id: assetId,
-            type: "image",
-            typeName: "asset",
-            props: {
-              name: "Map Background",
-              src: defaultFloorImage,
-              mimeType: defaultFloorImage.endsWith(".png")
-                ? "image/png"
-                : defaultFloorImage.endsWith(".jpg") ||
-                  defaultFloorImage.endsWith(".jpeg")
-                ? "image/jpeg"
-                : "image/*",
-              w: width,
-              h: height,
-              isAnimated: false,
-            },
-            meta: {},
-          },
-        ]);
-
-        const centerX = viewportBounds.minX + (viewportWidth - width) / 2;
-        const centerY = viewportBounds.minY + (viewportHeight - height) / 2;
-
-        editor.createShapes([
-          {
-            id: shapeId,
-            type: "image",
-            x: centerX,
-            y: centerY,
-            props: {
-              assetId,
-              w: width,
-              h: height,
-              crop: {
-                topLeft: { x: 0, y: 0 },
-                bottomRight: { x: 1, y: 1 },
-              },
-            },
-          },
-        ]);
-      }
+    if (mapNameFromQuery?.trim()) {
+      mapNameRef.current = mapNameFromQuery.trim();
     }
   };
 
@@ -307,10 +225,7 @@ const Stratmaker = () => {
                 assetId,
                 w: 20,
                 h: 20,
-                crop: {
-                  topLeft: { x: 0, y: 0 },
-                  bottomRight: { x: 1, y: 1 },
-                },
+                crop: { topLeft: { x: 0, y: 0 }, bottomRight: { x: 1, y: 1 } },
               },
             },
           ]);

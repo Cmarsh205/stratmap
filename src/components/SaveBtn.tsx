@@ -15,20 +15,21 @@ const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
 
   const handleSave = () => {
     try {
-      const saveName = prompt(
-        "Enter a name for your strat:",
-        name || "New Strat"
-      )?.trim();
+      let saveName = name?.trim() || "";
 
       if (!saveName) {
-        alert("Save cancelled: A name is required.");
-        return;
+        saveName =
+          prompt("Enter a name for your strat:", "New Strat")?.trim() || "";
+        if (!saveName) {
+          alert("Save cancelled: A name is required.");
+          return;
+        }
       }
 
       const PERSISTENCE_KEY = `tldraw-strat:${saveName}`;
 
       const snapshot = getSnapshot(store) as TLEditorSnapshot & {
-        meta?: { mapImage?: string | null; mapName?: string | null };
+        meta?: { mapName?: string | null };
       };
 
       snapshot.meta = {
@@ -44,8 +45,15 @@ const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
 
       localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(saveData));
 
-      alert(`Strat "${saveName}" saved successfully!`);
-      navigate(`/strats/${encodeURIComponent(saveName)}`);
+      alert(
+        name
+          ? `Strat "${saveName}" updated successfully!`
+          : `Strat "${saveName}" saved successfully!`
+      );
+
+      if (!name) {
+        navigate(`/strats/${encodeURIComponent(saveName)}`);
+      }
     } catch (err) {
       console.error("Error saving strat:", err);
       alert("Failed to save strat.");
