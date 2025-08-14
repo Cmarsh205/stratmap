@@ -8,67 +8,43 @@ import {
   Github,
   Linkedin,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/LogoSB.png";
 
 const Sidebar = () => {
+  const location = useLocation();
+
+  const links = [
+    { to: "/", label: "Home", icon: Home },
+    { to: "/maps", label: "Maps", icon: Map },
+    { to: "/stratmaker", label: "StratMaker", icon: Pen },
+    { to: "/strats", label: "Saved Strats", icon: Folder },
+    { to: "/settings", label: "Settings", icon: Settings },
+  ];
+
   return (
     <aside className="fixed top-0 left-0 h-screen w-60.25 !bg-slate-900 !backdrop-blur-sm !text-slate-300 !border-r !border-slate-800/95 flex flex-col justify-between shadow-lg">
       <div>
-        <div className="!p-2 !border-b !border-slate-800/95 flex justify-center ">
+        <div className="!p-2 !border-b !border-slate-800/95 flex justify-center">
           <img src={logo} alt="StratMap Logo" className="w-30 !pt-7 !pb-7" />
         </div>
 
-        <nav className="flex flex-col gap-6 !px-4 !pt-8 !text-lg !font-bold">
-          <Link to="/">
-            <Button
-              variant="custom"
-              className="w-full justify-start !px-6 !py-2 hover:!text-yellow-400"
-            >
-              <Home className="!mr-2 !h-6 !w-6 transition-colors" />
-              Home
-            </Button>
-          </Link>
-
-          <Link to="/maps">
-            <Button
-              variant="custom"
-              className="w-full justify-start !px-6 !py-2 hover:!text-yellow-400"
-            >
-              <Map className="!mr-2 !h-6 !w-6 transition-colors" />
-              Maps
-            </Button>
-          </Link>
-
-          <Link to="/stratmaker">
-            <Button
-              variant="custom"
-              className="w-full justify-start !px-6 !py-2 hover:!text-yellow-400"
-            >
-              <Pen className="!mr-2 !h-6 !w-6 transition-colors" />
-              StratMaker
-            </Button>
-          </Link>
-
-          <Link to="/strats">
-            <Button
-              variant="custom"
-              className="w-full justify-start !px-6 !py-2 hover:!text-yellow-400"
-            >
-              <Folder className="!mr-2 !h-6 !w-6 transition-colors" />
-              Saved Strats
-            </Button>
-          </Link>
-
-          <Link to="/settings">
-            <Button
-              variant="custom"
-              className="w-full justify-start !px-6 !py-2 hover:!text-yellow-400"
-            >
-              <Settings className="!mr-2 !h-6 !w-6 transition-colors" />
-              Settings
-            </Button>
-          </Link>
+        <nav className="flex flex-col !gap-6 !px-4 !pt-8 !text-lg !font-bold">
+          {links.map(({ to, label, icon: Icon }) => (
+            <Link key={to} to={to}>
+              <Button
+                variant="custom"
+                className={`!w-full !flex !justify-start !gap-3 !px-4 !py-3 !rounded-xl !font-medium !transition-all !duration-200 ${
+                  location.pathname === to
+                    ? "!bg-yellow-500/20 !text-yellow-400 !shadow-lg !shadow-yellow-500/25"
+                    : "!text-slate-300 hover:!text-white hover:!bg-slate-800/50"
+                }`}
+              >
+                <Icon className="!mr-2 !h-6 !w-6" />
+                {label}
+              </Button>
+            </Link>
+          ))}
         </nav>
       </div>
 
