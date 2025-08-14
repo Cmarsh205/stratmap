@@ -20,7 +20,7 @@ const OperatorSidebar = () => {
 
   return (
     <div
-      className={`fixed top left-60 h-[100%] max-h-[100%] bg-gray-800 border-r z-50 shadow-md flex flex-col items-center !pt-8 transition-all duration-300 ease-in-out ${
+      className={`fixed top left-60 h-[100%] max-h-[100%] !bg-slate-900 !border-l !border-slate-800/95 z-50 !shadow-md !flex !flex-col !items-center !pt-8 transition-all duration-300 ease-in-out ${
         collapsed ? "w-0" : "w-35"
       }`}
     >

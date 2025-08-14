@@ -13,14 +13,10 @@ import logo from "../../assets/LogoSB.png";
 
 const Sidebar = () => {
   return (
-    <aside className="h-screen w-60.25 !bg-slate-900 !backdrop-blur-sm !text-slate-300 !border-r !border-slate-800/95 flex flex-col justify-between shadow-lg">
+    <aside className="fixed top-0 left-0 h-screen w-60.25 !bg-slate-900 !backdrop-blur-sm !text-slate-300 !border-r !border-slate-800/95 flex flex-col justify-between shadow-lg">
       <div>
         <div className="!p-2 !border-b !border-slate-800/95 flex justify-center ">
-          <img
-            src={logo}
-            alt="StratMap Logo"
-            className="w-35 !pt-7 !pb-7"
-          />
+          <img src={logo} alt="StratMap Logo" className="w-30 !pt-7 !pb-7" />
         </div>
 
         <nav className="flex flex-col gap-6 !px-4 !pt-8 !text-lg !font-bold">

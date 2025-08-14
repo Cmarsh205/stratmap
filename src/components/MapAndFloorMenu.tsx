@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { mapsData } from "@/data/mapsData"; 
+import { mapsData } from "@/data/mapsData";
 
 interface MapAndFloorMenuProps {
-  onSelectFloor: (floorImage: string) => void; 
-  onSelectMapName: (mapName: string) => void;  
+  onSelectFloor: (floorImage: string) => void;
+  onSelectMapName: (mapName: string) => void;
 }
 
 export default function MapAndFloorMenu({
   onSelectFloor,
-  onSelectMapName
+  onSelectMapName,
 }: MapAndFloorMenuProps) {
   const [selectedMapName, setSelectedMapName] = useState("");
   const [selectedFloor, setSelectedFloor] = useState("");
@@ -17,7 +17,7 @@ export default function MapAndFloorMenu({
     const mapName = e.target.value;
     setSelectedMapName(mapName);
     setSelectedFloor("");
-    onSelectMapName(mapName); 
+    onSelectMapName(mapName);
   };
 
   const handleFloorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -28,7 +28,7 @@ export default function MapAndFloorMenu({
     const floor = map?.floors.find((f) => f.name === floorName);
 
     if (floor) {
-      onSelectFloor(floor.image); 
+      onSelectFloor(floor.image);
     }
   };
 
@@ -38,7 +38,7 @@ export default function MapAndFloorMenu({
       <select
         value={selectedMapName}
         onChange={handleMapChange}
-        className="!border !p-2 !rounded"
+        className="!bg-slate-900/90 !border !border-slate-700/50 hover:!border-slate-600/50 !text-slate-300 hover:!text-white !py-2.5 !px-4 !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2 !cursor-pointer focus:!outline-none focus:!ring-2 focus:!ring-yellow-500/75 focus:!border-yellow-500/75"
       >
         <option value="">Select Map</option>
         {mapsData.map((map) => (
@@ -52,7 +52,7 @@ export default function MapAndFloorMenu({
       <select
         value={selectedFloor}
         onChange={handleFloorChange}
-        className="!border !p-2 !rounded"
+        className="!bg-slate-900/90 !border !border-slate-700/50 hover:!border-slate-600/50 !text-slate-300 hover:!text-white !py-2.5 !px-4 !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2 !cursor-pointer focus:!outline-none focus:!ring-2 focus:!ring-yellow-500/75 focus:!border-yellow-500/75"
         disabled={!selectedMapName}
       >
         <option value="">Select Floor</option>

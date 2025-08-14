@@ -266,7 +266,7 @@ const Stratmaker = () => {
 
   return (
     <div
-      className="relative w-full h-screen"
+      className="relative h-screen !ml-60.25"
       onDrop={(e) => {
         const editor = window.__tldraw_editor;
         const iconUrl = e.dataTransfer.getData("operator-icon");
@@ -326,11 +326,11 @@ const Stratmaker = () => {
           />
         </div>
 
-        <div className="absolute bottom-4 right-[12%] z-50 flex gap-2">
+        <div className="absolute bottom-4 right-[11%] z-50 flex gap-2">
           <SaveCanvasButton store={store} mapNameRef={mapNameRef} />
           <button
             onClick={handleResetCanvas}
-            className="!bg-red-600 !text-black !px-3 !rounded-md hover:!bg-red-500 !flex !items-center !gap-2"
+            className="!gap-2 !h-11 !px-4 !py-2.5 !bg-red-500/20 hover:!bg-red-500 !text-red-400 hover:!text-white border !border-red-500/30 hover:!border-red-500 !rounded-xl !transition-all !duration-200 !flex !items-center !justify-center"
           >
             <Trash className="mr-2 h-4 w-4" />
             Reset

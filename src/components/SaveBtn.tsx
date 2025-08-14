@@ -55,7 +55,7 @@ const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
   return (
     <Button
       onClick={handleSave}
-      className="!bg-yellow-400 !text-gray-900 hover:!bg-yellow-300 !px-3 !py-2 !rounded-lg !flex !items-center !gap-2"
+      className="!h-11 bg-gradient-to-r !from-yellow-400 !to-yellow-500 hover:!from-yellow-300 hover:!to-yellow-400 !text-slate-900 !font-semibold !py-2.5 !px-4 !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2 !shadow-lg hover:!shadow-amber-500/25"
     >
       <Save className="!w-4 !h-4" />
       Save
