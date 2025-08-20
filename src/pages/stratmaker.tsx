@@ -12,7 +12,7 @@ import MapAndFloorMenu from "@/components/MapAndFloorMenu";
 import OperatorSidebar from "@/components/OperatorIconMenu";
 import SaveCanvasButton from "@/components/SaveBtn";
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { throttle } from "lodash";
 import { Trash } from "lucide-react";
@@ -42,6 +42,13 @@ const Stratmaker = () => {
 
   const editorRef = useRef<any>(null);
   const mapNameRef = useRef<string | null>(null);
+  const mapImageRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const mapImageUrl = params.get("mapImage");
+    if (mapImageUrl) mapImageRef.current = mapImageUrl;
+  }, [location.search]);
 
   useLayoutEffect(() => {
     setLoadingState({ status: "loading" });
@@ -86,16 +93,15 @@ const Stratmaker = () => {
     const editor = window.__tldraw_editor ?? editorRef.current;
     if (!editor) return;
 
-    const shapes = editor.getCurrentPageShapes();
-    shapes.forEach((shape: any) => {
+    editor.getCurrentPageShapes().forEach((shape: any) => {
       if (shape.type === "image" && shape.props?.name === "Map Background") {
         editor.deleteShapes([shape.id]);
       }
     });
 
-    const viewportBounds = editor.getViewportPageBounds();
-    const width = viewportBounds.width * 0.8;
-    const height = viewportBounds.height * 0.8;
+    const viewport = editor.getViewportPageBounds();
+    const width = viewport.width * 0.8;
+    const height = viewport.height * 0.8;
 
     const assetId = `asset:${crypto.randomUUID()}`;
     const shapeId = `shape:${crypto.randomUUID()}`;
@@ -108,28 +114,21 @@ const Stratmaker = () => {
         props: {
           name: "Map Background",
           src: imageUrl,
-          mimeType: imageUrl.endsWith(".png")
-            ? "image/png"
-            : imageUrl.endsWith(".jpg") || imageUrl.endsWith(".jpeg")
-            ? "image/jpeg"
-            : "image/*",
           w: width,
           h: height,
           isAnimated: false,
+          mimeType: "image/jpeg",
         },
         meta: {},
       },
     ]);
 
-    const centerX = viewportBounds.minX + (viewportBounds.width - width) / 2;
-    const centerY = viewportBounds.minY + (viewportBounds.height - height) / 2;
-
     editor.createShapes([
       {
         id: shapeId,
         type: "image",
-        x: centerX,
-        y: centerY,
+        x: viewport.minX + (viewport.width - width) / 2,
+        y: viewport.minY + (viewport.height - height) / 2,
         props: {
           assetId,
           w: width,
@@ -144,12 +143,24 @@ const Stratmaker = () => {
     editorRef.current = editor;
     window.__tldraw_editor = editor;
 
-    const params = new URLSearchParams(location.search);
-    const mapNameFromQuery = params.get("map");
-    if (mapNameFromQuery?.trim()) {
-      mapNameRef.current = mapNameFromQuery.trim();
+    if (mapImageRef.current) {
+      insertFloorOnCanvas(mapImageRef.current);
+      mapImageRef.current = null;
+
+      const url = new URL(window.location.href);
+      url.searchParams.delete("mapImage");
+      window.history.replaceState({}, "", url.toString());
     }
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const mapImageUrl = params.get("mapImage");
+
+    if (mapImageUrl && editorRef.current) {
+      insertFloorOnCanvas(mapImageUrl);
+    }
+  }, [location.search]);
 
   const handleResetCanvas = () => {
     if (

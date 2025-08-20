@@ -14,7 +14,7 @@ export default function MapsPage() {
     );
 
     if (confirmReplace) {
-      navigate(`/stratmaker?map=${encodeURIComponent(floorImage)}`);
+      navigate(`/stratmaker?mapImage=${encodeURIComponent(floorImage)}`);
     }
   };
 
