@@ -3,19 +3,33 @@ import { mapsData } from "../data/mapsData";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 export default function MapsPage() {
   const [selectedMap, setSelectedMap] = useState<any>(null);
+  const [pendingFloorImage, setPendingFloorImage] = useState<string | null>(
+    null
+  );
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleFloorSelect = (floorImage: string) => {
-    const confirmReplace = window.confirm(
-      "⚠️ Warning: Adding a new map will start a new strat. Please save any existing work before continuing.\n\nDo you want to proceed?"
-    );
+    setSelectedMap(null);
+    setPendingFloorImage(floorImage);
+    setIsConfirmOpen(true);
+  };
 
-    if (confirmReplace) {
-      navigate(`/stratmaker?mapImage=${encodeURIComponent(floorImage)}`);
+  const handleConfirm = () => {
+    if (pendingFloorImage) {
+      navigate(`/stratmaker?mapImage=${encodeURIComponent(pendingFloorImage)}`);
+      setPendingFloorImage(null);
     }
+    setIsConfirmOpen(false);
+  };
+
+  const handleCancel = () => {
+    setPendingFloorImage(null);
+    setIsConfirmOpen(false);
   };
 
   return (
@@ -85,6 +99,17 @@ export default function MapsPage() {
           </AnimatePresence>
         </DialogContent>
       </Dialog>
+
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={handleCancel}
+        onConfirm={handleConfirm}
+        title="Replace Current Strat?"
+        message="Adding a new map will start a new strat. Please save any existing work before continuing."
+        confirmText="Proceed"
+        cancelText="Cancel"
+        type="warning"
+      />
     </div>
   );
 }

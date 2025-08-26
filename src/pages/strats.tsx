@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { mapsData } from "@/data/mapsData";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 interface SavedStrat {
   key: string;
@@ -30,6 +31,8 @@ const SavedCanvasesPage = () => {
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteTargetKey, setDeleteTargetKey] = useState<string | null>(null);
 
   useEffect(() => {
     const keys = Object.keys(localStorage).filter(
@@ -100,9 +103,16 @@ const SavedCanvasesPage = () => {
   };
 
   const handleDelete = (key: string) => {
-    if (confirm("Are you sure you want to delete this strat?")) {
-      localStorage.removeItem(key);
-      setSavedCanvases((prev) => prev.filter((c) => c.key !== key));
+    setDeleteTargetKey(key);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (deleteTargetKey) {
+      localStorage.removeItem(deleteTargetKey);
+      setSavedCanvases((prev) => prev.filter((c) => c.key !== deleteTargetKey));
+      setDeleteTargetKey(null);
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -267,6 +277,16 @@ const SavedCanvasesPage = () => {
           </div>
         )}
       </div>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Strat?"
+        message="Are you sure you want to delete this strat? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
     </div>
   );
 };

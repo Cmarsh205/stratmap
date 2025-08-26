@@ -11,11 +11,12 @@ import "tldraw/tldraw.css";
 import MapAndFloorMenu from "@/components/MapAndFloorMenu";
 import OperatorSidebar from "@/components/OperatorIconMenu";
 import SaveCanvasButton from "@/components/SaveBtn";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 import { useLayoutEffect, useMemo, useRef, useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { throttle } from "lodash";
-import { Trash } from "lucide-react";
+import { Trash, HelpCircle } from "lucide-react";
 
 declare global {
   interface Window {
@@ -28,6 +29,8 @@ const Stratmaker = () => {
   const location = useLocation();
   const PERSISTENCE_KEY = `tldraw-strat:${name ?? "default"}`;
   const [canvasKey, setCanvasKey] = useState(0);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [isFirstVisitModalOpen, setIsFirstVisitModalOpen] = useState(false);
 
   const store = useMemo(
     () => createTLStore({ shapeUtils: defaultShapeUtils }),
@@ -43,6 +46,18 @@ const Stratmaker = () => {
   const editorRef = useRef<any>(null);
   const mapNameRef = useRef<string | null>(null);
   const mapImageRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const visited = localStorage.getItem("stratmaker-first-visit");
+    if (!visited) {
+      setIsFirstVisitModalOpen(true);
+    }
+  }, []);
+
+  const handleFirstVisitClose = () => {
+    localStorage.setItem("stratmaker-first-visit", "true");
+    setIsFirstVisitModalOpen(false);
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -163,15 +178,14 @@ const Stratmaker = () => {
   }, [location.search]);
 
   const handleResetCanvas = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to clear this strat and start over?"
-      )
-    ) {
-      localStorage.removeItem(PERSISTENCE_KEY);
-      setCanvasKey((prev) => prev + 1);
-      mapNameRef.current = null;
-    }
+    setIsResetModalOpen(true);
+  };
+
+  const confirmResetCanvas = () => {
+    localStorage.removeItem(PERSISTENCE_KEY);
+    setCanvasKey((prev) => prev + 1);
+    mapNameRef.current = null;
+    setIsResetModalOpen(false);
   };
 
   if (loadingState.status === "loading") {
@@ -261,12 +275,41 @@ const Stratmaker = () => {
             <Trash className="mr-2 h-4 w-4" />
             Reset
           </button>
+          <button
+            onClick={() => setIsFirstVisitModalOpen(true)}
+            className="!h-11 !px-4 !py-2.5 !bg-blue-500/20 hover:!bg-blue-500 !text-blue-400 hover:!text-white !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2"
+          >
+            <HelpCircle className="mr-2 h-4 w-4" />
+            Help
+          </button>
         </div>
       </Tldraw>
 
       <div className="absolute top-0 left-0 z-50">
         <OperatorSidebar />
       </div>
+
+      <ConfirmationModal
+        isOpen={isResetModalOpen}
+        onClose={() => setIsResetModalOpen(false)}
+        onConfirm={confirmResetCanvas}
+        title="Reset Strat?"
+        message="Are you sure you want to clear this strat and start over?"
+        confirmText="Reset"
+        cancelText="Cancel"
+        type="danger"
+      />
+
+      <ConfirmationModal
+        isOpen={isFirstVisitModalOpen}
+        onClose={handleFirstVisitClose}
+        onConfirm={handleFirstVisitClose}
+        title="Welcome to Stratmaker!"
+        message="Use the menu above to select the map and floor you would like if you have not already selected one from the Maps page, there is also a menu to the left that allows you to drag and drop the operators icons. Treat this as a whiteboard and use your creativity to help display your strategy. I highly recommend using the pages in the top left hand corner as you can add a different floor to each page. Enjoy!"
+        confirmText="Got it!"
+        cancelText=""
+        type="info"
+      />
     </div>
   );
 };
