@@ -152,6 +152,12 @@ const Stratmaker = () => {
         },
       },
     ]);
+
+    editor.updateShape({
+      id: shapeId,
+      isLocked: true,
+      meta: { permanentLock: true }, 
+    });
   };
 
   const handleMount = (editor: any) => {
