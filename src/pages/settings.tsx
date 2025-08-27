@@ -40,7 +40,7 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="!flex-1 !bg-gradient-to-br !from-slate-900 !via-slate-800 !to-slate-900 !min-h-screen !ml-60.25">
+    <div className="!flex-1 !bg-gradient-to-br !from-slate-900 !via-slate-800 !to-slate-900 !min-h-screen">
       <div className="!p-8">
         {/* Header */}
         <div className="!mb-8">

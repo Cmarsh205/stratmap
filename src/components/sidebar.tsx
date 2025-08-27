@@ -1,4 +1,4 @@
-import { Button } from "./button";
+import { Button } from "./ui/button";
 import {
   Home,
   Map,
@@ -9,7 +9,7 @@ import {
   Linkedin,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../assets/LogoSB.png";
+import logo from "../assets/LogoSB.png";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -23,10 +23,13 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-60.25 !bg-slate-900 !backdrop-blur-sm !text-slate-300 !border-r !border-slate-800/95 flex flex-col justify-between shadow-lg">
+    <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-60.25 !bg-slate-900 !backdrop-blur-sm !text-slate-300 !border-r !border-slate-800/95 flex-col justify-between shadow-lg">
       <div>
-        <div className="!p-2 !border-b !border-slate-800/95 flex justify-center">
-          <img src={logo} alt="StratMap Logo" className="w-30 !pt-7 !pb-7" />
+        <div>
+          <div className="!p-2 !border-b !border-slate-800/95 flex flex-col items-center">
+          <img src={logo} alt="StratMap Logo" className="w-24 !pt-7 !pb-3" />
+            <span className="text-white font-bold text-3xl !pb-3">StratMap</span>
+          </div>
         </div>
 
         <nav className="flex flex-col !gap-6 !px-4 !pt-8 !text-lg !font-bold">

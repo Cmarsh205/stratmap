@@ -33,7 +33,7 @@ export default function MapsPage() {
   };
 
   return (
-    <div className="!p-8 !ml-60.25 !flex-1 !bg-gradient-to-br !from-slate-900 !via-slate-800 !to-slate-900 !min-h-screen">
+    <div className="!p-8 !flex-1 !bg-gradient-to-br !from-slate-900 !via-slate-800 !to-slate-900 !min-h-screen">
       <h1 className="!text-4xl !font-bold !bg-gradient-to-r !from-yellow-400 !to-yellow-600 !bg-clip-text !text-transparent !mb-2">
         Maps
       </h1>

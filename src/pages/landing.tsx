@@ -97,7 +97,7 @@ const Landing: React.FC = () => {
   };
 
   return (
-    <div className="!ml-60.25 !flex-1 !bg-gradient-to-br !from-slate-900 !via-slate-800 !to-slate-900 !min-h-screen !overflow-y-auto">
+    <div className="!flex-1 !bg-gradient-to-br !from-slate-900 !via-slate-800 !to-slate-900 !min-h-screen !overflow-y-auto">
       {/* Hero Section */}
       <div className="!relative !overflow-hidden">
         {/* Background Image */}

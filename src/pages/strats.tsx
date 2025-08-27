@@ -135,7 +135,7 @@ const SavedCanvasesPage = () => {
   }
 
   return (
-    <div className="!min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 !p-8 !ml-60.25">
+    <div className="!min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 !p-8">
       <div className="!mx-auto">
         <h1 className="!text-4xl !font-bold !text-yellow-400 !mb-2">
           Saved Strats
@@ -209,7 +209,7 @@ const SavedCanvasesPage = () => {
         {filteredCanvases.length === 0 ? (
           <p className="!text-gray-400 text-lg">No saved strats found.</p>
         ) : (
-          <div className="!grid !grid-cols-1 sm:!grid-cols-2 md:!grid-cols-4 !gap-8">
+          <div className="!grid !grid-cols-1 sm:!grid-cols-2 md:!grid-cols-3 lg:!grid-cols-4 !gap-8">
             {filteredCanvases.map(
               ({ key, name, thumbnail, mapName, savedAt }) => (
                 <div
