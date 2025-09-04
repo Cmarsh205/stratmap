@@ -80,7 +80,7 @@ const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
         className="!h-11 bg-gradient-to-r !from-yellow-400 !to-yellow-500 hover:!from-yellow-300 hover:!to-yellow-400 !text-slate-900 !font-semibold !py-2.5 !px-4 !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2 !shadow-lg hover:!shadow-yellow-500/25"
       >
         <Save className="!w-4 !h-4" />
-        Save
+        <span className="hidden lg:inline">Save</span>
       </Button>
 
       <NameInputModal

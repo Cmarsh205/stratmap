@@ -21,7 +21,7 @@ const links = [
 
 const MobileNavbar = {
   Header: () => (
-    <div className="lg:hidden !bg-slate-900/95 !backdrop-blur-sm !border-b !border-slate-800/50 !px-4 !py-3 flex items-center justify-between">
+    <div className="lg:hidden fixed top-0 left-0 w-full z-50 !bg-slate-900/95 !backdrop-blur-sm !border-b !border-slate-800/50 !px-4 !py-3 flex items-center justify-between">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 flex items-center justify-center shadow-lg">
           <img src={logo} alt="StratMap Logo" className="w-full" />
@@ -51,7 +51,7 @@ const MobileNavbar = {
   Bottom: () => {
     const location = useLocation();
     return (
-      <div className="lg:hidden !bg-slate-900/95 !backdrop-blur-sm !border-t !border-slate-800/50 !px-2 !py-2">
+      <div className="lg:hidden fixed bottom-0 left-0 w-full z-50 !bg-slate-900/95 !backdrop-blur-sm !border-t !border-slate-800/50 !px-2 !py-2">
         <div className="flex items-center justify-around">
           {links.map(({ to, label, icon: Icon }) => {
             const isActive = location.pathname === to;

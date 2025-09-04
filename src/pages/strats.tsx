@@ -99,7 +99,7 @@ const SavedCanvasesPage = () => {
 
   const handleLoad = (key: string) => {
     const name = key.replace("tldraw-strat:", "");
-    navigate(`/strats/${encodeURIComponent(name)}`);
+    navigate(`/stratmaker/${encodeURIComponent(name)}`);
   };
 
   const handleDelete = (key: string) => {

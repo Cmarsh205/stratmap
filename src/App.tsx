@@ -15,7 +15,7 @@ const App: React.FC = () => {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/stratmaker" element={<Stratmaker />} />
           <Route path="/strats" element={<SavedCanvasesPage />} />
-          <Route path="/strats/:name" element={<Stratmaker />} />
+          <Route path="/stratmaker/:name" element={<Stratmaker />} />
           <Route path="/maps" element={<MapsPage />} />
         </Route>
       </Routes>

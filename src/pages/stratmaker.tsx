@@ -12,6 +12,7 @@ import MapAndFloorMenu from "@/components/MapAndFloorMenu";
 import OperatorSidebar from "@/components/OperatorIconMenu";
 import SaveCanvasButton from "@/components/SaveBtn";
 import ConfirmationModal from "@/components/ConfirmationModal";
+import OperatorSidebarMobile from "@/components/OperatorSidebarMobile";
 
 import { useLayoutEffect, useMemo, useRef, useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
@@ -156,7 +157,7 @@ const Stratmaker = () => {
     editor.updateShape({
       id: shapeId,
       isLocked: true,
-      meta: { permanentLock: true }, 
+      meta: { permanentLock: true },
     });
   };
 
@@ -192,6 +193,50 @@ const Stratmaker = () => {
     setCanvasKey((prev) => prev + 1);
     mapNameRef.current = null;
     setIsResetModalOpen(false);
+  };
+
+  const insertOperatorOnCanvas = (imageUrl: string) => {
+    const editor = window.__tldraw_editor;
+    if (!editor) return;
+
+    const viewport = editor.getViewportPageBounds();
+    const x = viewport.minX + viewport.width / 2;
+    const y = viewport.minY + viewport.height / 2;
+
+    const assetId = `asset:${crypto.randomUUID()}`;
+    const shapeId = `shape:${crypto.randomUUID()}`;
+
+    editor.updateAssets([
+      {
+        id: assetId,
+        type: "image",
+        typeName: "asset",
+        props: {
+          name: "Operator",
+          src: imageUrl,
+          w: 40,
+          h: 40,
+          mimeType: "image/png",
+          isAnimated: false,
+        },
+        meta: {},
+      },
+    ]);
+
+    editor.createShapes([
+      {
+        id: shapeId,
+        type: "image",
+        x,
+        y,
+        props: {
+          assetId,
+          w: 40,
+          h: 40,
+          crop: { topLeft: { x: 0, y: 0 }, bottomRight: { x: 1, y: 1 } },
+        },
+      },
+    ]);
   };
 
   if (loadingState.status === "loading") {
@@ -264,35 +309,48 @@ const Stratmaker = () => {
       }}
       onDragOver={(e) => e.preventDefault()}
     >
-      <Tldraw key={canvasKey} store={store} onMount={handleMount}>
+      <Tldraw
+        key={canvasKey}
+        store={store}
+        onMount={handleMount}
+        className="!h-screen !pt-16 lg:!pt-0 !pb-16 lg:!pb-0"
+      >
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
           <MapAndFloorMenu
             onSelectFloor={(image) => insertFloorOnCanvas(image)}
-            onSelectMapName={(mapName) => (mapNameRef.current = mapName)}
+            onSelectMapName={(mapName) => {
+              mapNameRef.current = mapName;
+            }}
+            className="!pt-13 lg:!pt-0 !pl-42 lg:!pl-0"
           />
         </div>
 
-        <div className="absolute bottom-4 right-[11%] z-50 flex gap-2">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex gap-2 !pb-28 lg:!pb-11 !pl-52 lg:!pl-0">
           <SaveCanvasButton store={store} mapNameRef={mapNameRef} />
+
           <button
             onClick={handleResetCanvas}
             className="!gap-2 !h-11 !px-4 !py-2.5 !bg-red-500/20 hover:!bg-red-500 !text-red-400 hover:!text-white border !border-red-500/30 hover:!border-red-500 !rounded-xl !transition-all !duration-200 !flex !items-center !justify-center"
           >
-            <Trash className="mr-2 h-4 w-4" />
-            Reset
+            <Trash className="h-4 w-4" />
+            <span className="hidden lg:inline">Reset</span>
           </button>
+
           <button
             onClick={() => setIsFirstVisitModalOpen(true)}
             className="!h-11 !px-4 !py-2.5 !bg-blue-500/20 hover:!bg-blue-500 !text-blue-400 hover:!text-white !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2"
           >
-            <HelpCircle className="mr-2 h-4 w-4" />
-            Help
+            <HelpCircle className="h-4 w-4" />
+            <span className="hidden lg:inline">Help</span>
           </button>
         </div>
       </Tldraw>
 
-      <div className="absolute top-0 left-0 z-50">
+      <div className="absolute top-0 left-0 z-50 hidden lg:block">
         <OperatorSidebar />
+      </div>
+      <div className="absolute top-0 left-0 z-50 !pt-27 !pl-2">
+        <OperatorSidebarMobile onSelectOperator={insertOperatorOnCanvas} />
       </div>
 
       <ConfirmationModal
