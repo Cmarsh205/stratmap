@@ -1,54 +1,51 @@
-# React + TypeScript + Vite
+# StratMap
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![StratMap Banner](./public/SiegeBanner.jpg)
 
-Currently, two official plugins are available:
+**StratMap** is an interactive strategy planner for Rainbow Six Siege. It allows players to visually create, save, and share tactical plans for any map. Think of it as a digital whiteboard for planning operator positions, objective locations, and team strategies.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- 🔨 **Interactive Maps**: Select maps and floors to plan strategies.
+- 🔍 **Operator Icons**: Drag-and-drop operator icons onto maps.
+- 🎨 **Whiteboard Canvas**: Use Tldraw as a whiteboard-like editor to create exactly what you want.
+- 💾 **Save & Load Strats**: Save your strategies locally and load them anytime.
+- 📊 **Filter & Search**: Easily find saved strategies by name, map, or date.
+- 📄 **Multi-floor Support**: Use Tldraw pages to plan multiple floors of the same map.
+- 📱 **Mobile Responsive**: Works on both desktop and mobile devices.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Screenshots
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+![Saved Strats](./public/StratMap-Strats.PNG)  
+*View and manage your saved strategies.*
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+![StratMap Editor](./public/StratMap-Stratmaker.PNG)  
+*Drag operators and plan your strategies visually.*
+
+---
+
+## Motivation
+
+Gaming has been a huge part of my life for as long as I can remember, one of my favourite series being the Tom Clancey's Rainbow Six games. I have played a lot of Siege in particular and have always wanted to be more competitive like the game was designed to be. So when starting this project I knew I wanted it gaming focused and helpful to my friends, the public, and I. This is what I landed on, a tool that can help bring your teammates together and form a competitive strategy to use in your games.
+
+---
+
+## Tech Stack
+
+# Frontend:
+  * React
+  * Tailwind CSS
+  * ShadcnUI
+  * Lucide Icons
+
+# Built With:
+  * Vite
+  * TypeScript
+
+# Deployed On:
+  * Railway - https://stratmap.xyz/
+  
