@@ -49,3 +49,16 @@ Gaming has been a huge part of my life for as long as I can remember, one of my 
 ### Deployed On:
   * Railway - https://stratmap.xyz/
   
+---
+
+## Future Plans
+
+- Real time collaboration
+- Unique Share links
+- User Accounts
+
+---
+
+## Credits
+
+Huge thank you to my coach Lucas Hillier for all of his help, guidance, and insights. And thank you to the Get Coding program as a whole for offering this amazing program in the first place!
