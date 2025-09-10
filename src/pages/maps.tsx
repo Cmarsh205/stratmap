@@ -6,7 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "@/components/ConfirmationModal";
 
 export default function MapsPage() {
-  const [selectedMap, setSelectedMap] = useState<any>(null);
+  const [selectedMap, setSelectedMap] = useState<{
+    name: string;
+    floors: { name: string; image: string }[];
+  } | null>(null);
   const [pendingFloorImage, setPendingFloorImage] = useState<string | null>(
     null
   );
@@ -75,24 +78,26 @@ export default function MapsPage() {
                 </h2>
 
                 <div className="!grid !grid-cols-1 !gap-4">
-                  {selectedMap.floors.map((floor: any) => (
-                    <motion.div
-                      key={floor.name}
-                      onClick={() => handleFloorSelect(floor.image)}
-                      className="!bg-slate-800/50 !rounded-2xl !overflow-hidden !border !border-slate-700/50 hover:!border-slate-600/50 !transition-all !duration-300 hover:!shadow-2xl hover:!shadow-slate-900/50 hover:!scale-[1.02]"
-                    >
-                      <div className="group">
-                        <img
-                          src={floor.image}
-                          alt={floor.name}
-                          className="!w-full !h-32 !object-cover"
-                        />
-                        <div className="!p-2 !text-center !text-sm !font-medium !text-white group-hover:!text-yellow-400">
-                          {floor.name}
+                  {selectedMap.floors.map(
+                    (floor: { name: string; image: string }) => (
+                      <motion.div
+                        key={floor.name}
+                        onClick={() => handleFloorSelect(floor.image)}
+                        className="!bg-slate-800/50 !rounded-2xl !overflow-hidden !border !border-slate-700/50 hover:!border-slate-600/50 !transition-all !duration-300 hover:!shadow-2xl hover:!shadow-slate-900/50 hover:!scale-[1.02]"
+                      >
+                        <div className="group">
+                          <img
+                            src={floor.image}
+                            alt={floor.name}
+                            className="!w-full !h-32 !object-cover"
+                          />
+                          <div className="!p-2 !text-center !text-sm !font-medium !text-white group-hover:!text-yellow-400">
+                            {floor.name}
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    )
+                  )}
                 </div>
               </motion.div>
             )}

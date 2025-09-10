@@ -23,7 +23,6 @@ interface SavedStrat {
   floorImage?: string;
 }
 
-// Utility function to get map thumbnail from floor image
 const getThumbnailByFloorImage = (
   floorImage: string | undefined
 ): string | undefined => {
@@ -67,8 +66,6 @@ const SavedCanvasesPage = () => {
         floorImage =
           savedData?.snapshot?.meta?.floorImage || savedData?.floorImage;
         mapName = savedData?.snapshot?.meta?.mapName || savedData?.mapName;
-
-        // Get thumbnail based on floor image
         thumbnail = getThumbnailByFloorImage(floorImage);
 
         const savedTime =
@@ -92,7 +89,36 @@ const SavedCanvasesPage = () => {
       return { key, name, thumbnail, mapName, savedAt, savedAtRaw, floorImage };
     });
 
-    setSavedCanvases(canvases);
+    if (canvases.length === 0) {
+      fetch("/exampleStrat.json")
+        .then((res) => res.json())
+        .then((example) => {
+          const exampleKey = "tldraw-strat:Example Strat";
+
+          localStorage.setItem(exampleKey, JSON.stringify(example));
+
+          const fallback: SavedStrat = {
+            key: exampleKey,
+            name: "Example Strat",
+            thumbnail: getThumbnailByFloorImage(example.floorImage),
+            mapName: example.mapName,
+            savedAt: new Date(example.savedAt).toLocaleString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            savedAtRaw: new Date(example.savedAt).getTime(),
+            floorImage: example.floorImage,
+          };
+
+          setSavedCanvases([fallback]);
+        })
+        .catch((err) => console.error("Error loading example strat:", err));
+    } else {
+      setSavedCanvases(canvases);
+    }
 
     const handleClickOutside = (event: MouseEvent) => {
       if (

@@ -27,7 +27,7 @@ const Settings: React.FC = () => {
     vsync: true,
   });
 
-  const handleInputChange = (key: string, value: any) => {
+  const handleInputChange = (key: string, value: string | number | boolean) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
