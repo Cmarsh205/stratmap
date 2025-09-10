@@ -196,7 +196,20 @@ const Stratmaker = () => {
     editorRef.current = editor;
     window.__tldraw_editor = editor;
 
+    const url = new URL(window.location.href);
+    const mapImageUrl = url.searchParams.get("mapImage");
+
+    if (mapImageUrl) {
+      // Force replace background from URL param immediately on mount
+      insertFloorOnCanvas(mapImageUrl);
+      floorImageRef.current = mapImageUrl;
+      url.searchParams.delete("mapImage");
+      window.history.replaceState({}, "", url.toString());
+      return;
+    }
+
     if (floorImageRef.current) {
+      // Otherwise, only insert if a background doesn't already exist
       const hasBackground = editor.getCurrentPageShapes().some(
         (shape) =>
           shape.type === "image" &&
@@ -216,12 +229,6 @@ const Stratmaker = () => {
 
       if (!hasBackground) {
         insertFloorOnCanvas(floorImageRef.current);
-      }
-
-      const url = new URL(window.location.href);
-      if (url.searchParams.has("mapImage")) {
-        url.searchParams.delete("mapImage");
-        window.history.replaceState({}, "", url.toString());
       }
     }
   };
