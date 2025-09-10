@@ -103,7 +103,7 @@ const Landing: React.FC = () => {
         {/* Background Image */}
         <div className="!absolute !inset-0">
           <img
-            src="public\SiegeBanner.jpg"
+            src="/SiegeBanner.jpg"
             alt="Siege banner of sledge"
             className="!w-full !h-full !object-cover"
           />
