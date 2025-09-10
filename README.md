@@ -36,16 +36,16 @@ Gaming has been a huge part of my life for as long as I can remember, one of my 
 
 ## Tech Stack
 
-# Frontend:
+### Frontend:
   * React
   * Tailwind CSS
   * ShadcnUI
   * Lucide Icons
 
-# Built With:
+### Built With:
   * Vite
   * TypeScript
 
-# Deployed On:
+### Deployed On:
   * Railway - https://stratmap.xyz/
   
