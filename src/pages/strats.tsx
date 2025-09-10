@@ -20,7 +20,21 @@ interface SavedStrat {
   mapName?: string;
   savedAt?: string;
   savedAtRaw?: number;
+  floorImage?: string;
 }
+
+// Utility function to get map thumbnail from floor image
+const getThumbnailByFloorImage = (
+  floorImage: string | undefined
+): string | undefined => {
+  if (!floorImage) return undefined;
+  for (const map of mapsData) {
+    if (map.floors.some((floor) => floor.image === floorImage)) {
+      return map.thumbnail;
+    }
+  }
+  return undefined;
+};
 
 const SavedCanvasesPage = () => {
   const [savedCanvases, setSavedCanvases] = useState<SavedStrat[]>([]);
@@ -45,23 +59,21 @@ const SavedCanvasesPage = () => {
       let mapName: string | undefined;
       let savedAt: string | undefined;
       let savedAtRaw: number | undefined;
+      let floorImage: string | undefined;
 
       try {
         const savedData = JSON.parse(localStorage.getItem(key) || "{}");
 
-        mapName =
-          savedData?.snapshot?.meta?.mapName || savedData?.mapName || undefined;
+        floorImage =
+          savedData?.snapshot?.meta?.floorImage || savedData?.floorImage;
+        mapName = savedData?.snapshot?.meta?.mapName || savedData?.mapName;
 
-        const mapEntry = mapsData.find(
-          (map) => map.name.toLowerCase() === mapName?.toLowerCase()
-        );
-        thumbnail = mapEntry?.thumbnail;
+        // Get thumbnail based on floor image
+        thumbnail = getThumbnailByFloorImage(floorImage);
 
         const savedTime =
           savedData?.savedAt || savedData?.snapshot?.meta?.savedAt || undefined;
-
         savedAtRaw = savedTime ? new Date(savedTime).getTime() : undefined;
-
         savedAt = savedAtRaw
           ? new Date(savedAtRaw).toLocaleString(undefined, {
               year: "numeric",
@@ -77,7 +89,7 @@ const SavedCanvasesPage = () => {
         savedAtRaw = undefined;
       }
 
-      return { key, name, thumbnail, mapName, savedAt, savedAtRaw };
+      return { key, name, thumbnail, mapName, savedAt, savedAtRaw, floorImage };
     });
 
     setSavedCanvases(canvases);

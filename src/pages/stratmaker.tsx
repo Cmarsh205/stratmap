@@ -5,6 +5,9 @@ import {
   getSnapshot,
   loadSnapshot,
   DefaultSpinner,
+  type Editor,
+  type TLAssetId,
+  type TLShapeId,
 } from "tldraw";
 import "tldraw/tldraw.css";
 
@@ -14,14 +17,14 @@ import SaveCanvasButton from "@/components/SaveBtn";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import OperatorSidebarMobile from "@/components/OperatorSidebarMobile";
 
-import { useLayoutEffect, useMemo, useRef, useState, useEffect } from "react";
+import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { throttle } from "lodash";
 import { Trash, HelpCircle } from "lucide-react";
 
 declare global {
   interface Window {
-    __tldraw_editor?: any;
+    __tldraw_editor?: Editor;
   }
 }
 
@@ -33,10 +36,12 @@ const Stratmaker = () => {
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [isFirstVisitModalOpen, setIsFirstVisitModalOpen] = useState(false);
 
-  const store = useMemo(
-    () => createTLStore({ shapeUtils: defaultShapeUtils }),
-    [canvasKey]
+  const [store, setStore] = useState(() =>
+    createTLStore({ shapeUtils: defaultShapeUtils })
   );
+  useEffect(() => {
+    setStore(createTLStore({ shapeUtils: defaultShapeUtils }));
+  }, [canvasKey]);
 
   const [loadingState, setLoadingState] = useState<
     | { status: "loading" }
@@ -44,15 +49,14 @@ const Stratmaker = () => {
     | { status: "error"; error: string }
   >({ status: "loading" });
 
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<Editor | null>(null);
   const mapNameRef = useRef<string | null>(null);
-  const mapImageRef = useRef<string | null>(null);
+  const floorImageRef = useRef<string | null>(null);
 
+  // First visit modal
   useEffect(() => {
     const visited = localStorage.getItem("stratmaker-first-visit");
-    if (!visited) {
-      setIsFirstVisitModalOpen(true);
-    }
+    if (!visited) setIsFirstVisitModalOpen(true);
   }, []);
 
   const handleFirstVisitClose = () => {
@@ -60,12 +64,14 @@ const Stratmaker = () => {
     setIsFirstVisitModalOpen(false);
   };
 
+  // Load floor image from URL param
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const mapImageUrl = params.get("mapImage");
-    if (mapImageUrl) mapImageRef.current = mapImageUrl;
+    if (mapImageUrl) floorImageRef.current = mapImageUrl;
   }, [location.search]);
 
+  // Load strat from localStorage
   useLayoutEffect(() => {
     setLoadingState({ status: "loading" });
 
@@ -75,11 +81,19 @@ const Stratmaker = () => {
         const parsed = JSON.parse(saved);
         const snapshot = parsed.snapshot || parsed;
         mapNameRef.current = snapshot?.meta?.mapName ?? parsed.mapName ?? null;
+        floorImageRef.current = parsed.floorImage ?? null;
+
         loadSnapshot(store, snapshot);
+
+        // Do not insert the floor image here; the snapshot may already
+        // contain the background image. We'll handle insertion in onMount
+        // only if no existing background is present.
+
         setLoadingState({ status: "ready" });
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Unknown error";
         console.error("Error loading snapshot:", err);
-        setLoadingState({ status: "error", error: err.message });
+        setLoadingState({ status: "error", error: message });
       }
     } else {
       setLoadingState({ status: "ready" });
@@ -88,14 +102,12 @@ const Stratmaker = () => {
     const cleanup = store.listen(
       throttle(() => {
         const snapshot = getSnapshot(store);
-        const existingData = JSON.parse(
-          localStorage.getItem(PERSISTENCE_KEY) || "{}"
-        );
 
         const saveData = {
           snapshot,
           mapName: mapNameRef.current,
-          savedAt: existingData.savedAt,
+          floorImage: floorImageRef.current,
+          savedAt: new Date().toISOString(),
         };
 
         localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(saveData));
@@ -106,11 +118,29 @@ const Stratmaker = () => {
   }, [PERSISTENCE_KEY, store]);
 
   const insertFloorOnCanvas = (imageUrl: string) => {
+    floorImageRef.current = imageUrl;
+
     const editor = window.__tldraw_editor ?? editorRef.current;
     if (!editor) return;
 
-    editor.getCurrentPageShapes().forEach((shape: any) => {
-      if (shape.type === "image" && shape.props?.name === "Map Background") {
+    editor.getCurrentPageShapes().forEach((shape) => {
+      if (
+        shape.type === "image" &&
+        // Delete previously inserted backgrounds. Support both the new
+        // mapBackground flag and the older permanentLock-only backgrounds.
+        ((
+          shape as {
+            meta?: { mapBackground?: boolean; permanentLock?: boolean };
+          }
+        ).meta?.mapBackground === true ||
+          (
+            shape as {
+              meta?: { mapBackground?: boolean; permanentLock?: boolean };
+            }
+          ).meta?.permanentLock === true ||
+          (shape as { props?: { name?: string } }).props?.name ===
+            "Map Background")
+      ) {
         editor.deleteShapes([shape.id]);
       }
     });
@@ -119,8 +149,8 @@ const Stratmaker = () => {
     const width = viewport.width * 0.8;
     const height = viewport.height * 0.8;
 
-    const assetId = `asset:${crypto.randomUUID()}`;
-    const shapeId = `shape:${crypto.randomUUID()}`;
+    const assetId = `asset:${crypto.randomUUID()}` as TLAssetId;
+    const shapeId = `shape:${crypto.randomUUID()}` as TLShapeId;
 
     editor.updateAssets([
       {
@@ -156,42 +186,52 @@ const Stratmaker = () => {
 
     editor.updateShape({
       id: shapeId,
+      type: "image",
       isLocked: true,
-      meta: { permanentLock: true },
+      meta: { permanentLock: true, mapBackground: true },
     });
   };
 
-  const handleMount = (editor: any) => {
+  const handleMount = (editor: Editor) => {
     editorRef.current = editor;
     window.__tldraw_editor = editor;
 
-    if (mapImageRef.current) {
-      insertFloorOnCanvas(mapImageRef.current);
-      mapImageRef.current = null;
+    if (floorImageRef.current) {
+      const hasBackground = editor.getCurrentPageShapes().some(
+        (shape) =>
+          shape.type === "image" &&
+          ((
+            shape as {
+              meta?: { mapBackground?: boolean; permanentLock?: boolean };
+            }
+          ).meta?.mapBackground === true ||
+            (
+              shape as {
+                meta?: { mapBackground?: boolean; permanentLock?: boolean };
+              }
+            ).meta?.permanentLock === true ||
+            (shape as { props?: { name?: string } }).props?.name ===
+              "Map Background")
+      );
+
+      if (!hasBackground) {
+        insertFloorOnCanvas(floorImageRef.current);
+      }
 
       const url = new URL(window.location.href);
-      url.searchParams.delete("mapImage");
-      window.history.replaceState({}, "", url.toString());
+      if (url.searchParams.has("mapImage")) {
+        url.searchParams.delete("mapImage");
+        window.history.replaceState({}, "", url.toString());
+      }
     }
   };
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const mapImageUrl = params.get("mapImage");
-
-    if (mapImageUrl && editorRef.current) {
-      insertFloorOnCanvas(mapImageUrl);
-    }
-  }, [location.search]);
-
-  const handleResetCanvas = () => {
-    setIsResetModalOpen(true);
-  };
-
+  const handleResetCanvas = () => setIsResetModalOpen(true);
   const confirmResetCanvas = () => {
     localStorage.removeItem(PERSISTENCE_KEY);
     setCanvasKey((prev) => prev + 1);
     mapNameRef.current = null;
+    floorImageRef.current = null;
     setIsResetModalOpen(false);
   };
 
@@ -203,8 +243,8 @@ const Stratmaker = () => {
     const x = viewport.minX + viewport.width / 2;
     const y = viewport.minY + viewport.height / 2;
 
-    const assetId = `asset:${crypto.randomUUID()}`;
-    const shapeId = `shape:${crypto.randomUUID()}`;
+    const assetId = `asset:${crypto.randomUUID()}` as TLAssetId;
+    const shapeId = `shape:${crypto.randomUUID()}` as TLShapeId;
 
     editor.updateAssets([
       {
@@ -239,15 +279,14 @@ const Stratmaker = () => {
     ]);
   };
 
-  if (loadingState.status === "loading") {
+  if (loadingState.status === "loading")
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <DefaultSpinner />
       </div>
     );
-  }
 
-  if (loadingState.status === "error") {
+  if (loadingState.status === "error")
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <div className="text-center">
@@ -256,7 +295,6 @@ const Stratmaker = () => {
         </div>
       </div>
     );
-  }
 
   return (
     <div
@@ -264,48 +302,43 @@ const Stratmaker = () => {
       onDrop={(e) => {
         const editor = window.__tldraw_editor;
         const iconUrl = e.dataTransfer.getData("operator-icon");
+        if (!iconUrl || !editor) return;
 
-        if (iconUrl && editor) {
-          const mousePoint = editor.screenToPage({
-            x: e.clientX,
-            y: e.clientY,
-          });
+        const mousePoint = editor.screenToPage({ x: e.clientX, y: e.clientY });
+        const assetId = `asset:${crypto.randomUUID()}` as TLAssetId;
+        const shapeId = `shape:${crypto.randomUUID()}` as TLShapeId;
 
-          const assetId = `asset:${crypto.randomUUID()}`;
-          const shapeId = `shape:${crypto.randomUUID()}`;
-
-          editor.updateAssets([
-            {
-              id: assetId,
-              type: "image",
-              typeName: "asset",
-              props: {
-                name: "Operator",
-                src: iconUrl,
-                mimeType: "image/png",
-                w: 20,
-                h: 20,
-                isAnimated: false,
-              },
-              meta: {},
+        editor.updateAssets([
+          {
+            id: assetId,
+            type: "image",
+            typeName: "asset",
+            props: {
+              name: "Operator",
+              src: iconUrl,
+              mimeType: "image/png",
+              w: 40,
+              h: 40,
+              isAnimated: false,
             },
-          ]);
+            meta: {},
+          },
+        ]);
 
-          editor.createShapes([
-            {
-              id: shapeId,
-              type: "image",
-              x: mousePoint.x,
-              y: mousePoint.y,
-              props: {
-                assetId,
-                w: 20,
-                h: 20,
-                crop: { topLeft: { x: 0, y: 0 }, bottomRight: { x: 1, y: 1 } },
-              },
+        editor.createShapes([
+          {
+            id: shapeId,
+            type: "image",
+            x: mousePoint.x,
+            y: mousePoint.y,
+            props: {
+              assetId,
+              w: 40,
+              h: 40,
+              crop: { topLeft: { x: 0, y: 0 }, bottomRight: { x: 1, y: 1 } },
             },
-          ]);
-        }
+          },
+        ]);
       }}
       onDragOver={(e) => e.preventDefault()}
     >
@@ -318,15 +351,17 @@ const Stratmaker = () => {
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
           <MapAndFloorMenu
             onSelectFloor={(image) => insertFloorOnCanvas(image)}
-            onSelectMapName={(mapName) => {
-              mapNameRef.current = mapName;
-            }}
+            onSelectMapName={(mapName) => (mapNameRef.current = mapName)}
             className="!pt-13 lg:!pt-0 !pl-42 lg:!pl-0"
           />
         </div>
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex gap-2 !pb-28 lg:!pb-11 !pl-52 lg:!pl-0">
-          <SaveCanvasButton store={store} mapNameRef={mapNameRef} />
+          <SaveCanvasButton
+            store={store}
+            mapNameRef={mapNameRef}
+            floorImageRef={floorImageRef}
+          />
 
           <button
             onClick={handleResetCanvas}

@@ -1,17 +1,22 @@
 import { useState, type RefObject } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
-import { getSnapshot, type TLEditorSnapshot } from "tldraw";
+import { getSnapshot, type TLEditorSnapshot, type TLStore } from "tldraw";
 import { Save } from "lucide-react";
 import NameInputModal from "@/components/SaveModal";
 import ConfirmationModal from "@/components/ConfirmationModal";
 
 interface SaveCanvasButtonProps {
-  store: any;
+  store: TLStore;
   mapNameRef: RefObject<string | null>;
+  floorImageRef: RefObject<string | null>;
 }
 
-const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
+const SaveCanvasButton = ({
+  store,
+  mapNameRef,
+  floorImageRef,
+}: SaveCanvasButtonProps) => {
   const { name } = useParams();
   const navigate = useNavigate();
 
@@ -37,7 +42,6 @@ const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
       }
 
       const PERSISTENCE_KEY = `tldraw-strat:${trimmedName}`;
-
       const snapshot = getSnapshot(store) as TLEditorSnapshot & {
         meta?: { mapName?: string | null };
       };
@@ -47,9 +51,18 @@ const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
         mapName: mapNameRef.current || snapshot.meta?.mapName || null,
       };
 
+      const existingData = JSON.parse(
+        localStorage.getItem(PERSISTENCE_KEY) || "{}"
+      );
+
       const saveData = {
         snapshot,
-        mapName: mapNameRef.current || snapshot.meta?.mapName || null,
+        mapName:
+          mapNameRef.current ||
+          snapshot.meta?.mapName ||
+          existingData.mapName ||
+          null,
+        floorImage: floorImageRef.current || existingData.floorImage || null,
         savedAt: new Date().toISOString(),
       };
 
@@ -62,9 +75,7 @@ const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
       );
       setIsConfirmationOpen(true);
 
-      if (!name) {
-        navigate(`/strats/${encodeURIComponent(trimmedName)}`);
-      }
+      if (!name) navigate(`/stratmaker/${encodeURIComponent(trimmedName)}`);
     } catch (err) {
       console.error("Error saving strat:", err);
       setConfirmationMessage("Failed to save strat.");
@@ -74,7 +85,6 @@ const SaveCanvasButton = ({ store, mapNameRef }: SaveCanvasButtonProps) => {
 
   return (
     <>
-      {/* Save Button */}
       <Button
         onClick={handleSaveClick}
         className="!h-11 bg-gradient-to-r !from-yellow-400 !to-yellow-500 hover:!from-yellow-300 hover:!to-yellow-400 !text-slate-900 !font-semibold !py-2.5 !px-4 !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2 !shadow-lg hover:!shadow-yellow-500/25"

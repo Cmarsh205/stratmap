@@ -285,7 +285,7 @@ const Landing: React.FC = () => {
               </span>
             </h2>
             <p className="!text-xl text-slate-400">
-              See what pro players and teams are saying about StratMaster
+              See what pro players and teams are saying about StratMap
             </p>
           </div>
 
@@ -336,8 +336,8 @@ const Landing: React.FC = () => {
             Ready to Dominate?
           </h2>
           <p className="!text-xl !text-slate-300 !mb-12 !max-w-2xl !mx-auto">
-            Join thousands of strategists who are already using StratMaster to
-            plan their path to victory.
+            Join thousands of strategists who are already using StratMap to plan
+            their path to victory.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
