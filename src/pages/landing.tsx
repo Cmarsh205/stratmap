@@ -40,7 +40,7 @@ const Landing: React.FC = () => {
     {
       icon: Brain,
       title: "Team Collaboration",
-      description: "Use together with teamates in real time ",
+      description: "Use together with teammates in real time ",
       color: "from-purple-400 to-purple-600",
     },
   ];
