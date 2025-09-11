@@ -21,10 +21,10 @@
 ## Screenshots
 
 ![Saved Strats](./public/StratMap-Strats.PNG)  
-*View and manage your saved strategies.*
+_View and manage your saved strategies._
 
 ![StratMap Editor](./public/StratMap-Stratmaker.PNG)  
-*Drag operators and plan your strategies visually.*
+_Drag operators and plan your strategies visually._
 
 ---
 
@@ -37,15 +37,83 @@ Gaming has been a huge part of my life for as long as I can remember, one of my 
 ## Tech Stack
 
 ### Frontend:
-  * React
-  * Tailwind CSS
-  * ShadcnUI
-  * Lucide Icons
+
+- React
+- Tailwind CSS
+- ShadcnUI
+- Lucide Icons
 
 ### Built With:
-  * Vite
-  * TypeScript
+
+- Vite
+- TypeScript
 
 ### Deployed On:
-  * Railway - https://stratmap.xyz/
-  
+
+- Railway - https://stratmap.xyz/
+
+---
+
+## Future Plans
+
+- Real time collaboration
+- Unique Share links
+- User Accounts
+
+---
+
+## Credits
+
+Huge thank you to my coach Lucas Hillier for all of his help, guidance, and insights. And thank you to the Get Coding program as a whole for offering this amazing program in the first place!
+
+---
+
+## Contact Info:
+
+- Linked In - https://www.linkedin.com/in/carter-marsh-21b569184/
+- Email - carter-205@hotmail.com
+
+---
+
+## 🚀 Installation & Setup
+
+Follow these steps to get the project running locally:
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Cmarsh205/stratmap.git
+cd stratmap
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+Or if you prefer:
+
+```bash
+yarn install
+```
+
+### 3. Start The Development Server
+
+```bash
+npm run dev
+```
+
+### 4. Build For Production
+
+```bash
+npm run build
+```
+
+### 5. Preview The Production Build
+
+```bash
+npm run preview
+```
+
+---
