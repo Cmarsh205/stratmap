@@ -7,7 +7,6 @@ const Layout: React.FC = () => {
   const location = useLocation();
   const isStratmaker = location.pathname.includes("/stratmaker");
 
-  // Only apply top/bottom padding for non-Stratmaker pages
   const contentPaddingClasses = isStratmaker
     ? ""
     : "!pt-12 !pb-12 lg:!pt-0 lg:!pb-0";
@@ -27,7 +26,7 @@ const Layout: React.FC = () => {
         </div>
 
         {/* Page content */}
-        <div className="flex-1 h-[calc(100vh-8rem)] lg:h-auto">
+        <div className="flex-1 !h-[calc(100vh-8rem)] lg:h-auto">
           <Outlet />
         </div>
 

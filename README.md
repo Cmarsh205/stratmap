@@ -48,4 +48,3 @@ Gaming has been a huge part of my life for as long as I can remember, one of my 
 
 # Deployed On:
   * Railway - https://stratmap.xyz/
-  
