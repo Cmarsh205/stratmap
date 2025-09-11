@@ -30,21 +30,22 @@
 
 ## Motivation
 
-Gaming has been a huge part of my life for as long as I can remember, one of my favourite series being the Tom Clancey's Rainbow Six games. I have played a lot of Siege in particular and have always wanted to be more competitive like the game was designed to be. So when starting this project I knew I wanted it gaming focused and helpful to my friends, the public, and I. This is what I landed on, a tool that can help bring your teammates together and form a competitive strategy to use in your games.
+Gaming has been a huge part of my life for as long as I can remember, one of my favourite series being the Tom Clancy's Rainbow Six games. I have played a lot of Siege in particular and have always wanted to be more competitive like the game was designed to be. So when starting this project I knew I wanted it gaming focused and helpful to my friends, the public, and I. This is what I landed on, a tool that can help bring your teammates together and form a competitive strategy to use in your games.
 
 ---
 
 ## Tech Stack
 
-# Frontend:
+### Frontend:
   * React
   * Tailwind CSS
   * ShadcnUI
   * Lucide Icons
 
-# Built With:
+### Built With:
   * Vite
   * TypeScript
 
-# Deployed On:
+### Deployed On:
   * Railway - https://stratmap.xyz/
+  
