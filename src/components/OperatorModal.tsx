@@ -30,7 +30,7 @@ const OperatorModal: React.FC<OperatorModalProps> = ({
       />
 
       {/* Modal */}
-      <div className="relative !bg-slate-800/95 !backdrop-blur-sm !border !border-slate-700/50 !rounded-2xl !shadow-2xl !shadow-slate-900/50 !w-full !max-w-md transform transition-all duration-300 scale-100 opacity-100 max-h-[80vh] overflow-y-auto">
+      <div className="relative !bg-slate-800/95 !backdrop-blur-sm !border !border-slate-700/50 !rounded-2xl !shadow-2xl !shadow-slate-900/50 !w-full !max-w-md transform transition-all duration-300 scale-100 opacity-100 max-h-[80dvh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}

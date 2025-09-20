@@ -26,7 +26,7 @@ const Layout: React.FC = () => {
         </div>
 
         {/* Page content */}
-        <div className="flex-1 !h-[calc(100vh-8rem)] lg:h-auto">
+        <div className="flex-1 !h-[calc(100dvh-8rem)] lg:h-auto">
           <Outlet />
         </div>
 

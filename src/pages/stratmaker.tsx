@@ -326,7 +326,7 @@ const Stratmaker = () => {
 
   return (
     <div
-      className="relative h-screen"
+      className="relative h-[100dvh]"
       onDrop={(e) => {
         const editor = window.__tldraw_editor;
         const iconUrl = e.dataTransfer.getData("operator-icon");
