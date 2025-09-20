@@ -53,7 +53,6 @@ const Stratmaker = () => {
   const mapNameRef = useRef<string | null>(null);
   const floorImageRef = useRef<string | null>(null);
 
-  // First visit modal
   useEffect(() => {
     const visited = localStorage.getItem("stratmaker-first-visit");
     if (!visited) setIsFirstVisitModalOpen(true);
@@ -64,14 +63,12 @@ const Stratmaker = () => {
     setIsFirstVisitModalOpen(false);
   };
 
-  // Load floor image from URL param
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const mapImageUrl = params.get("mapImage");
     if (mapImageUrl) floorImageRef.current = mapImageUrl;
   }, [location.search]);
 
-  // Load strat from localStorage
   useLayoutEffect(() => {
     setLoadingState({ status: "loading" });
 
@@ -84,10 +81,6 @@ const Stratmaker = () => {
         floorImageRef.current = parsed.floorImage ?? null;
 
         loadSnapshot(store, snapshot);
-
-        // Do not insert the floor image here; the snapshot may already
-        // contain the background image. We'll handle insertion in onMount
-        // only if no existing background is present.
 
         setLoadingState({ status: "ready" });
       } catch (err: unknown) {
@@ -126,8 +119,6 @@ const Stratmaker = () => {
     editor.getCurrentPageShapes().forEach((shape) => {
       if (
         shape.type === "image" &&
-        // Delete previously inserted backgrounds. Support both the new
-        // mapBackground flag and the older permanentLock-only backgrounds.
         ((
           shape as {
             meta?: { mapBackground?: boolean; permanentLock?: boolean };
@@ -146,50 +137,82 @@ const Stratmaker = () => {
     });
 
     const viewport = editor.getViewportPageBounds();
-    const width = viewport.width * 0.8;
-    const height = viewport.height * 0.8;
 
-    const assetId = `asset:${crypto.randomUUID()}` as TLAssetId;
-    const shapeId = `shape:${crypto.randomUUID()}` as TLShapeId;
+    const img = new Image();
+    img.onload = () => {
+      const isMobile = viewport.width < 1024;
 
-    editor.updateAssets([
-      {
-        id: assetId,
-        type: "image",
-        typeName: "asset",
-        props: {
-          name: "Map Background",
-          src: imageUrl,
-          w: width,
-          h: height,
-          isAnimated: false,
-          mimeType: "image/jpeg",
+      let width, height, cropLeft, cropRight;
+
+      if (isMobile) {
+        const scaleX = viewport.width / img.width;
+        const scaleY = viewport.height / img.height;
+        const scale = Math.min(scaleX, scaleY);
+
+        width = img.width * scale;
+        height = img.height * scale;
+        cropLeft = 0;
+        cropRight = 1;
+      } else {
+        const maxHeight = viewport.height * 0.8;
+        const maxWidth = viewport.width * 0.8;
+        const scaleX = maxWidth / img.width;
+        const scaleY = maxHeight / img.height;
+        const scale = Math.min(scaleX, scaleY);
+
+        width = img.width * scale;
+        height = img.height * scale;
+        cropLeft = 0;
+        cropRight = 1;
+      }
+
+      const assetId = `asset:${crypto.randomUUID()}` as TLAssetId;
+      const shapeId = `shape:${crypto.randomUUID()}` as TLShapeId;
+
+      editor.updateAssets([
+        {
+          id: assetId,
+          type: "image",
+          typeName: "asset",
+          props: {
+            name: "Map Background",
+            src: imageUrl,
+            w: width,
+            h: height,
+            isAnimated: false,
+            mimeType: "image/jpeg",
+          },
+          meta: {},
         },
-        meta: {},
-      },
-    ]);
+      ]);
 
-    editor.createShapes([
-      {
+      editor.createShapes([
+        {
+          id: shapeId,
+          type: "image",
+          x: viewport.minX + (viewport.width - width) / 2,
+          y: viewport.minY + (viewport.height - height) / 2,
+          props: {
+            assetId,
+            w: width,
+            h: height,
+            crop: {
+              topLeft: { x: cropLeft, y: 0 },
+              bottomRight: { x: cropRight, y: 1 },
+            },
+          },
+        },
+      ]);
+
+      editor.updateShape({
         id: shapeId,
         type: "image",
-        x: viewport.minX + (viewport.width - width) / 2,
-        y: viewport.minY + (viewport.height - height) / 2,
-        props: {
-          assetId,
-          w: width,
-          h: height,
-          crop: { topLeft: { x: 0, y: 0 }, bottomRight: { x: 1, y: 1 } },
-        },
-      },
-    ]);
+        isLocked: true,
+        meta: { permanentLock: true, mapBackground: true },
+      });
+    };
 
-    editor.updateShape({
-      id: shapeId,
-      type: "image",
-      isLocked: true,
-      meta: { permanentLock: true, mapBackground: true },
-    });
+    img.src = imageUrl;
   };
 
   const handleMount = (editor: Editor) => {
@@ -200,7 +223,6 @@ const Stratmaker = () => {
     const mapImageUrl = url.searchParams.get("mapImage");
 
     if (mapImageUrl) {
-      // Force replace background from URL param immediately on mount
       insertFloorOnCanvas(mapImageUrl);
       floorImageRef.current = mapImageUrl;
       url.searchParams.delete("mapImage");
@@ -209,7 +231,6 @@ const Stratmaker = () => {
     }
 
     if (floorImageRef.current) {
-      // Otherwise, only insert if a background doesn't already exist
       const hasBackground = editor.getCurrentPageShapes().some(
         (shape) =>
           shape.type === "image" &&
@@ -353,7 +374,7 @@ const Stratmaker = () => {
         key={canvasKey}
         store={store}
         onMount={handleMount}
-        className="!h-screen !pt-16 lg:!pt-0 !pb-16 lg:!pb-0"
+        className="!h-full !pt-16 lg:!pt-0 !pb-16 lg:!pb-0"
       >
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
           <MapAndFloorMenu
