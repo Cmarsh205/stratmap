@@ -326,7 +326,7 @@ const Stratmaker = () => {
 
   return (
     <div
-      className="relative h-[100dvh]"
+      className="relative h-[100dvh] overflow-hidden"
       onDrop={(e) => {
         const editor = window.__tldraw_editor;
         const iconUrl = e.dataTransfer.getData("operator-icon");
@@ -374,7 +374,7 @@ const Stratmaker = () => {
         key={canvasKey}
         store={store}
         onMount={handleMount}
-        className="!h-full !pt-16 lg:!pt-0 !pb-16 lg:!pb-0"
+        className="!h-full !pt-16 lg:!pt-0 !pb-16 lg:!pb-0 overflow-hidden"
       >
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
           <MapAndFloorMenu
