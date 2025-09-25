@@ -37,7 +37,7 @@ const Sidebar = () => {
             <Link key={to} to={to}>
               <Button
                 variant="custom"
-                className={`!w-full !flex !justify-start !gap-3 !px-4 !py-3 !rounded-xl !font-medium !transition-all !duration-200 ${
+                className={`hover:cursor-pointer !w-full !flex !justify-start !gap-3 !px-4 !py-3 !rounded-xl !font-medium !transition-all !duration-200 ${
                   location.pathname === to
                     ? "!bg-yellow-500/20 !text-yellow-400 !shadow-lg !shadow-yellow-500/25"
                     : "!text-slate-300 hover:!text-white hover:!bg-slate-800/50"

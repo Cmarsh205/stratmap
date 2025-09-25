@@ -44,7 +44,7 @@ export default function MapsPage() {
         Choose your map and get started
       </p>
 
-      <div className="!grid !grid-cols-1 md:!grid-cols-2 xl:!grid-cols-3 2xl:!grid-cols-4 !gap-6">
+      <div className="!grid !grid-cols-1 md:!grid-cols-2 xl:!grid-cols-3 2xl:!grid-cols-4 !gap-6 hover:cursor-pointer">
         {mapsData.map((map) => (
           <div
             key={map.name}
@@ -64,7 +64,7 @@ export default function MapsPage() {
       </div>
 
       <Dialog open={!!selectedMap} onOpenChange={() => setSelectedMap(null)}>
-        <DialogContent className="!p-6 !max-w-lg !flex-1 !bg-gradient-to-br !from-slate-900 !via-slate-800 !to-slate-900 !text-yellow-400">
+        <DialogContent className="!p-6 !max-w-lg !flex-1 !bg-gradient-to-br !from-slate-900 !via-slate-800 !to-slate-900 !text-yellow-400 ">
           <AnimatePresence>
             {selectedMap && (
               <motion.div
@@ -73,7 +73,7 @@ export default function MapsPage() {
                 exit={{ opacity: 0, y: 15 }}
                 transition={{ duration: 0.25 }}
               >
-                <h2 className="!text-xl !font-semibold !mb-4 !text-center md:!text-left !text-yellow-400">
+                <h2 className="!text-xl !font-semibold !mb-4 !text-center md:!text-left !text-yellow-400 ">
                   {selectedMap.name} - Select Floor
                 </h2>
 
@@ -83,7 +83,7 @@ export default function MapsPage() {
                       <motion.div
                         key={floor.name}
                         onClick={() => handleFloorSelect(floor.image)}
-                        className="!bg-slate-800/50 !rounded-2xl !overflow-hidden !border !border-slate-700/50 hover:!border-slate-600/50 !transition-all !duration-300 hover:!shadow-2xl hover:!shadow-slate-900/50 hover:!scale-[1.02]"
+                        className="!bg-slate-800/50 !rounded-2xl !overflow-hidden !border !border-slate-700/50 hover:!border-slate-600/50 !transition-all !duration-300 hover:!shadow-2xl hover:!shadow-slate-900/50 hover:!scale-[1.02] hover:cursor-pointer"
                       >
                         <div className="group">
                           <img

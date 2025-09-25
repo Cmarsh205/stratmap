@@ -393,7 +393,7 @@ const Stratmaker = () => {
 
           <button
             onClick={handleResetCanvas}
-            className="!gap-2 !h-11 !px-4 !py-2.5 !bg-red-500/20 hover:!bg-red-500 !text-red-400 hover:!text-white border !border-red-500/30 hover:!border-red-500 !rounded-xl !transition-all !duration-200 !flex !items-center !justify-center"
+            className="hover:cursor-pointer !gap-2 !h-11 !px-4 !py-2.5 !bg-red-500/20 hover:!bg-red-500 !text-red-400 hover:!text-white border !border-red-500/30 hover:!border-red-500 !rounded-xl !transition-all !duration-200 !flex !items-center !justify-center"
           >
             <Trash className="h-4 w-4" />
             <span className="hidden lg:inline">Reset</span>
@@ -401,7 +401,7 @@ const Stratmaker = () => {
 
           <button
             onClick={() => setIsFirstVisitModalOpen(true)}
-            className="!h-11 !px-4 !py-2.5 !bg-blue-500/20 hover:!bg-blue-500 !text-blue-400 hover:!text-white !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2"
+            className="hover:cursor-pointer !h-11 !px-4 !py-2.5 !bg-blue-500/20 hover:!bg-blue-500 !text-blue-400 hover:!text-white !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2"
           >
             <HelpCircle className="h-4 w-4" />
             <span className="hidden lg:inline">Help</span>

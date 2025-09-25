@@ -196,7 +196,7 @@ const SavedCanvasesPage = () => {
 
           <div className="relative" ref={filterRef}>
             <Button
-              className="!h-12.5 !bg-slate-800/50 !border !border-slate-700/50 hover:!border-slate-600/50 !text-slate-300 hover:!text-white !py-3 !px-6 !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2"
+              className="hover:cursor-pointer !h-12.5 !bg-slate-800/50 !border !border-slate-700/50 hover:!border-slate-600/50 !text-slate-300 hover:!text-white !py-3 !px-6 !rounded-xl !transition-all !duration-200 !flex !items-center !gap-2"
               onClick={() => setFilterMenuOpen((prev) => !prev)}
             >
               <Filter className="w-5 h-5" />
@@ -296,14 +296,14 @@ const SavedCanvasesPage = () => {
                     <div className="!mt-auto !flex !gap-3 !pt-4">
                       <Button
                         onClick={() => handleLoad(key)}
-                        className="!h-11 !flex-1 !bg-gradient-to-r !from-yellow-500 !to-yellow-600 hover:!from-yellow-400 hover:!to-yellow-500 !text-slate-900 !font-semibold !py-2.5 !px-4 !rounded-xl !transition-all !duration-200 !flex !items-center !justify-center !gap-2 !shadow-lg hover:!shadow-amber-500/25"
+                        className="hover:cursor-pointer !h-11 !flex-1 !bg-gradient-to-r !from-yellow-500 !to-yellow-600 hover:!from-yellow-400 hover:!to-yellow-500 !text-slate-900 !font-semibold !py-2.5 !px-4 !rounded-xl !transition-all !duration-200 !flex !items-center !justify-center !gap-2 !shadow-lg hover:!shadow-amber-500/25"
                       >
                         <Play className="!w-4 !h-4" />
                         Load
                       </Button>
                       <Button
                         onClick={() => handleDelete(key)}
-                        className="!h-11 !px-4 !py-2.5 !bg-red-500/20 hover:!bg-red-500 !text-red-400 hover:!text-white border !border-red-500/30 hover:!border-red-500 !rounded-xl !transition-all !duration-200 !flex !items-center !justify-center"
+                        className="hover:cursor-pointer !h-11 !px-4 !py-2.5 !bg-red-500/20 hover:!bg-red-500 !text-red-400 hover:!text-white border !border-red-500/30 hover:!border-red-500 !rounded-xl !transition-all !duration-200 !flex !items-center !justify-center"
                       >
                         <Trash2 className="!w-4 !h-4" />
                       </Button>

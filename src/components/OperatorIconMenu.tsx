@@ -27,7 +27,7 @@ const OperatorSidebar = () => {
       <Button
         variant="ghost"
         size="sm"
-        className="absolute -right-4 top-1/2 -translate-y-1/2 rounded-full shadow-md p-1 !bg-yellow-400 !text-gray-800"
+        className="hover:cursor-pointer absolute -right-4 top-1/2 -translate-y-1/2 rounded-full shadow-md p-1 !bg-yellow-400 !text-gray-800"
         onClick={toggleCollapsed}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
