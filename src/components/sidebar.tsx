@@ -7,12 +7,16 @@ import {
   Folder,
   Github,
   Linkedin,
+  LogIn,
+  LogOut,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import logo from "../assets/LogoSB.png";
 
 const Sidebar = () => {
   const location = useLocation();
+  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
 
   const links = [
     { to: "/", label: "Home", icon: Home },
@@ -27,8 +31,10 @@ const Sidebar = () => {
       <div>
         <div>
           <div className="!p-2 !border-b !border-slate-800/95 flex flex-col items-center">
-          <img src={logo} alt="StratMap Logo" className="w-24 !pt-7 !pb-3" />
-            <span className="text-white font-bold text-3xl !pb-3">StratMap</span>
+            <img src={logo} alt="StratMap Logo" className="w-24 !pt-7 !pb-3" />
+            <span className="text-white font-bold text-3xl !pb-3">
+              StratMap
+            </span>
           </div>
         </div>
 
@@ -51,26 +57,56 @@ const Sidebar = () => {
         </nav>
       </div>
 
-      <div className="flex justify-center gap-6 !p-4 !border-t !border-slate-800/95">
-        <a
-          href="https://github.com/Cmarsh205"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="!text-slate-500 hover:!text-yellow-400 transition-colors"
-          aria-label="GitHub"
-        >
-          <Github className="h-5 w-5" />
-        </a>
+      <div className="flex flex-col gap-4">
+        {/* Login/Logout Button */}
+        <div className="!px-4 !pb-4">
+          <Button
+            variant="custom"
+            onClick={() => {
+              if (isAuthenticated) {
+                logout({ logoutParams: { returnTo: window.location.origin } });
+              } else {
+                loginWithRedirect();
+              }
+            }}
+            className="hover:cursor-pointer !w-full !flex !justify-start !gap-3 !px-4 !py-3 !rounded-xl !font-medium !transition-all !duration-200 !text-slate-300 hover:!text-white hover:!bg-slate-800/50"
+          >
+            {isAuthenticated ? (
+              <>
+                <LogOut className="!mr-2 !h-6 !w-6" />
+                Logout
+              </>
+            ) : (
+              <>
+                <LogIn className="!mr-2 !h-6 !w-6" />
+                Login
+              </>
+            )}
+          </Button>
+        </div>
 
-        <a
-          href="https://www.linkedin.com/in/carter-marsh-21b569184/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="!text-slate-500 hover:!text-yellow-400 transition-colors"
-          aria-label="LinkedIn"
-        >
-          <Linkedin className="h-5 w-5" />
-        </a>
+        {/* Social Links */}
+        <div className="flex justify-center gap-6 !p-4 !border-t !border-slate-800/95">
+          <a
+            href="https://github.com/Cmarsh205"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="!text-slate-500 hover:!text-yellow-400 transition-colors"
+            aria-label="GitHub"
+          >
+            <Github className="h-5 w-5" />
+          </a>
+
+          <a
+            href="https://www.linkedin.com/in/carter-marsh-21b569184/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="!text-slate-500 hover:!text-yellow-400 transition-colors"
+            aria-label="LinkedIn"
+          >
+            <Linkedin className="h-5 w-5" />
+          </a>
+        </div>
       </div>
     </aside>
   );
