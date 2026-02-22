@@ -3,18 +3,21 @@ import { Button } from "@/components/ui/button";
 import {
   Trash2,
   Play,
-  MapPin,
   Clock,
   Filter,
   Search,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import { mapsData } from "@/data/mapsData";
 import ConfirmationModal from "@/components/ConfirmationModal";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost";
+
 interface SavedStrat {
-  key: string;
+  id: string;
   name: string;
   thumbnail?: string;
   mapName?: string;
@@ -23,103 +26,149 @@ interface SavedStrat {
   floorImage?: string;
 }
 
-const getThumbnailByFloorImage = (
-  floorImage: string | undefined
+interface StratmapRow {
+  id: string;
+  title: string;
+  description: string;
+  created_at?: string;
+  updated_at?: string;
+  data?: { mapName?: string; floorImage?: string };
+}
+
+const getThumbnailByMapName = (
+  mapName: string | undefined,
 ): string | undefined => {
-  if (!floorImage) return undefined;
-  for (const map of mapsData) {
-    if (map.floors.some((floor) => floor.image === floorImage)) {
-      return map.thumbnail;
-    }
-  }
-  return undefined;
+  if (!mapName?.trim()) return undefined;
+  const normalized = mapName.trim().toLowerCase();
+  const map = mapsData.find((m) => m.name.toLowerCase() === normalized);
+  return map?.thumbnail;
+};
+
+const getThumbnailByFloorImage = (
+  floorImage: string | undefined,
+): string | undefined => {
+  if (!floorImage?.trim()) return undefined;
+  const normalized = floorImage.trim();
+  const pathPart = normalized.includes("/maps/")
+    ? normalized.slice(normalized.indexOf("/maps/"))
+    : normalized;
+  const map = mapsData.find((m) =>
+    m.floors.some((f) => f.image === pathPart || f.image === normalized),
+  );
+  return map?.thumbnail;
+};
+
+const rowToSavedStrat = (row: StratmapRow): SavedStrat => {
+  const mapName = row.description || row.data?.mapName || undefined;
+  const floorImage = row.data?.floorImage;
+  const thumbnail =
+    getThumbnailByMapName(mapName) ?? getThumbnailByFloorImage(floorImage);
+  const updatedAt = row.updated_at || row.created_at;
+  const savedAtRaw = updatedAt ? new Date(updatedAt).getTime() : undefined;
+  const savedAt = savedAtRaw
+    ? new Date(savedAtRaw).toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : undefined;
+  return {
+    id: row.id,
+    name: row.title,
+    thumbnail,
+    mapName,
+    savedAt,
+    savedAtRaw,
+    floorImage: undefined,
+  };
 };
 
 const SavedCanvasesPage = () => {
   const [savedCanvases, setSavedCanvases] = useState<SavedStrat[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"newest" | "oldest" | "map">(
-    "newest"
+    "newest",
   );
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteTargetKey, setDeleteTargetKey] = useState<string | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [loadState, setLoadState] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
-    const keys = Object.keys(localStorage).filter(
-      (key) => key.startsWith("tldraw-strat:") && !key.endsWith("default")
-    );
-
-    const canvases: SavedStrat[] = keys.map((key) => {
-      const name = key.replace("tldraw-strat:", "");
-      let thumbnail: string | undefined;
-      let mapName: string | undefined;
-      let savedAt: string | undefined;
-      let savedAtRaw: number | undefined;
-      let floorImage: string | undefined;
-
-      try {
-        const savedData = JSON.parse(localStorage.getItem(key) || "{}");
-
-        floorImage =
-          savedData?.snapshot?.meta?.floorImage || savedData?.floorImage;
-        mapName = savedData?.snapshot?.meta?.mapName || savedData?.mapName;
-        thumbnail = getThumbnailByFloorImage(floorImage);
-
-        const savedTime =
-          savedData?.savedAt || savedData?.snapshot?.meta?.savedAt || undefined;
-        savedAtRaw = savedTime ? new Date(savedTime).getTime() : undefined;
-        savedAt = savedAtRaw
-          ? new Date(savedAtRaw).toLocaleString(undefined, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          : undefined;
-      } catch {
-        thumbnail = undefined;
-        savedAt = undefined;
-        savedAtRaw = undefined;
-      }
-
-      return { key, name, thumbnail, mapName, savedAt, savedAtRaw, floorImage };
-    });
-
-    if (canvases.length === 0) {
-      fetch("/exampleStrat.json")
-        .then((res) => res.json())
-        .then((example) => {
-          const exampleKey = "tldraw-strat:Example Strat";
-
-          localStorage.setItem(exampleKey, JSON.stringify(example));
-
-          const fallback: SavedStrat = {
-            key: exampleKey,
-            name: "Example Strat",
-            thumbnail: getThumbnailByFloorImage(example.floorImage),
-            mapName: example.mapName,
-            savedAt: new Date(example.savedAt).toLocaleString(undefined, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-            savedAtRaw: new Date(example.savedAt).getTime(),
-            floorImage: example.floorImage,
-          };
-
-          setSavedCanvases([fallback]);
-        })
-        .catch((err) => console.error("Error loading example strat:", err));
-    } else {
-      setSavedCanvases(canvases);
+    if (!isAuthenticated) {
+      setSavedCanvases([]);
+      setLoadState("success");
+      return;
     }
 
+    let cancelled = false;
+    setLoadState("loading");
+    setLoadError(null);
+
+    getAccessTokenSilently()
+      .then((token) =>
+        fetch(`${API_URL}/api/v1/stratmaps`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      )
+      .then(async (res) => {
+        if (!res.ok) {
+          const isNetworkError = res.type === "error" || res.status === 0;
+          if (isNetworkError || res.status === 404) {
+            throw new Error(
+              "Could not reach the API. Make sure the API is running and VITE_API_URL in .env points to it (e.g. http://localhost).",
+            );
+          }
+          if (res.status === 401) {
+            throw new Error("Please log in again.");
+          }
+          let msg = "Failed to load strats.";
+          try {
+            const body = await res.json();
+            if (body?.message) msg = body.message;
+            if (body?.error) msg = body.error;
+          } catch {
+            msg = res.statusText || msg;
+          }
+          throw new Error(msg);
+        }
+        return res.json();
+      })
+      .then((json) => {
+        if (cancelled) return;
+        const rows: StratmapRow[] = json.data ?? [];
+        setSavedCanvases(rows.map(rowToSavedStrat));
+        setLoadState("success");
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("Error loading strats:", err);
+        const message =
+          err instanceof Error
+            ? err.message
+            : String(err).startsWith("Failed to fetch")
+              ? "Could not reach the API. Make sure the API is running and VITE_API_URL in .env points to it (e.g. http://localhost)."
+              : "Failed to load strats.";
+        setLoadError(message);
+        setLoadState("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated, getAccessTokenSilently]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         filterRef.current &&
@@ -128,47 +177,77 @@ const SavedCanvasesPage = () => {
         setFilterMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLoad = (key: string) => {
-    const name = key.replace("tldraw-strat:", "");
-    navigate(`/stratmaker/${encodeURIComponent(name)}`);
+  const handleLoad = (strat: SavedStrat) => {
+    navigate(`/stratmaker/${encodeURIComponent(strat.name)}`, {
+      state: { stratId: strat.id },
+    });
   };
 
-  const handleDelete = (key: string) => {
-    setDeleteTargetKey(key);
+  const handleDelete = (id: string) => {
+    setDeleteTargetId(id);
+    setDeleteError(null);
     setIsDeleteModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    if (deleteTargetKey) {
-      localStorage.removeItem(deleteTargetKey);
-      setSavedCanvases((prev) => prev.filter((c) => c.key !== deleteTargetKey));
-      setDeleteTargetKey(null);
-      setIsDeleteModalOpen(false);
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteTargetId(null);
+    setDeleteError(null);
+    setIsDeleting(false);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteTargetId === null) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      const token = await getAccessTokenSilently();
+      const res = await fetch(`${API_URL}/api/v1/stratmaps/${deleteTargetId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const msg =
+          body?.message ??
+          body?.error ??
+          (res.status === 401
+            ? "Please log in again."
+            : "Failed to delete strat.");
+
+        throw new Error(msg);
+      }
+      setSavedCanvases((prev) => prev.filter((c) => c.id !== deleteTargetId));
+      closeDeleteModal();
+    } catch (err) {
+      console.error("Error deleting strat:", err);
+      setDeleteError(
+        err instanceof Error ? err.message : "Failed to delete strat.",
+      );
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   let filteredCanvases = savedCanvases.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (filterType === "newest") {
     filteredCanvases = filteredCanvases.sort(
-      (a, b) => (b.savedAtRaw || 0) - (a.savedAtRaw || 0)
+      (a, b) => (b.savedAtRaw || 0) - (a.savedAtRaw || 0),
     );
   } else if (filterType === "oldest") {
     filteredCanvases = filteredCanvases.sort(
-      (a, b) => (a.savedAtRaw || 0) - (b.savedAtRaw || 0)
+      (a, b) => (a.savedAtRaw || 0) - (b.savedAtRaw || 0),
     );
   } else if (filterType === "map") {
     filteredCanvases = filteredCanvases.sort((a, b) =>
-      (a.mapName || "").localeCompare(b.mapName || "")
+      (a.mapName || "").localeCompare(b.mapName || ""),
     );
   }
 
@@ -244,14 +323,27 @@ const SavedCanvasesPage = () => {
           </div>
         </div>
 
-        {filteredCanvases.length === 0 ? (
+        {loadState === "loading" ? (
+          <div className="!flex !items-center !justify-center !gap-2 !py-16 !text-slate-400">
+            <Loader2 className="!w-6 !h-6 animate-spin" />
+            <span>Loading strats…</span>
+          </div>
+        ) : !isAuthenticated ? (
+          <p className="!text-gray-400 text-lg">
+            Log in to view and manage your saved strats.
+          </p>
+        ) : loadState === "error" ? (
+          <p className="!text-red-400 text-lg">
+            {loadError ?? "Failed to load strats."}
+          </p>
+        ) : filteredCanvases.length === 0 ? (
           <p className="!text-gray-400 text-lg">No saved strats found.</p>
         ) : (
           <div className="!grid !grid-cols-1 sm:!grid-cols-2 md:!grid-cols-3 lg:!grid-cols-4 !gap-8">
             {filteredCanvases.map(
-              ({ key, name, thumbnail, mapName, savedAt }) => (
+              ({ id, name, thumbnail, mapName, savedAt, savedAtRaw }) => (
                 <div
-                  key={key}
+                  key={id}
                   className="group !bg-slate-800/50 !backdrop-blur-sm !rounded-2xl overflow-hidden !border !border-slate-700/50 hover:!border-slate-600/50 transition-all duration-300 hover:!shadow-2xl hover:!shadow-slate-900/50 hover:!scale-[1.02]"
                 >
                   {thumbnail ? (
@@ -275,16 +367,6 @@ const SavedCanvasesPage = () => {
                     </h2>
 
                     <div className="flex justify-between">
-                      {mapName && (
-                        <p
-                          className="!mt-1 !text-gray-300 !text-sm !truncate !flex !items-center !gap-1"
-                          title={mapName}
-                        >
-                          <MapPin className="!w-4 !h-4 !text-gray-400" />
-                          <span>{mapName}</span>
-                        </p>
-                      )}
-
                       {savedAt && (
                         <p className="!mt-1 !text-gray-400 !text-xs !italic !flex !items-center !gap-1">
                           <Clock className="!w-4 !h-4 !text-gray-400" />
@@ -295,14 +377,23 @@ const SavedCanvasesPage = () => {
 
                     <div className="!mt-auto !flex !gap-3 !pt-4">
                       <Button
-                        onClick={() => handleLoad(key)}
+                        onClick={() =>
+                          handleLoad({
+                            id,
+                            name,
+                            thumbnail,
+                            mapName,
+                            savedAt,
+                            savedAtRaw,
+                          })
+                        }
                         className="hover:cursor-pointer !h-11 !flex-1 !bg-gradient-to-r !from-yellow-500 !to-yellow-600 hover:!from-yellow-400 hover:!to-yellow-500 !text-slate-900 !font-semibold !py-2.5 !px-4 !rounded-xl !transition-all !duration-200 !flex !items-center !justify-center !gap-2 !shadow-lg hover:!shadow-amber-500/25"
                       >
                         <Play className="!w-4 !h-4" />
                         Load
                       </Button>
                       <Button
-                        onClick={() => handleDelete(key)}
+                        onClick={() => handleDelete(id)}
                         className="hover:cursor-pointer !h-11 !px-4 !py-2.5 !bg-red-500/20 hover:!bg-red-500 !text-red-400 hover:!text-white border !border-red-500/30 hover:!border-red-500 !rounded-xl !transition-all !duration-200 !flex !items-center !justify-center"
                       >
                         <Trash2 className="!w-4 !h-4" />
@@ -310,20 +401,24 @@ const SavedCanvasesPage = () => {
                     </div>
                   </div>
                 </div>
-              )
+              ),
             )}
           </div>
         )}
       </div>
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
+        onClose={closeDeleteModal}
         onConfirm={confirmDelete}
         title="Delete Strat?"
-        message="Are you sure you want to delete this strat? This action cannot be undone."
-        confirmText="Delete"
+        message={
+          deleteError ??
+          "Are you sure you want to delete this strat? This action cannot be undone."
+        }
+        confirmText={isDeleting ? "Deleting…" : "Delete"}
         cancelText="Cancel"
         type="danger"
+        confirmDisabled={isDeleting}
       />
     </div>
   );

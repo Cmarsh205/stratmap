@@ -11,6 +11,7 @@ interface ConfirmationModalProps {
   confirmText?: string;
   cancelText?: string;
   type?: "danger" | "warning" | "info";
+  confirmDisabled?: boolean;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -22,6 +23,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   confirmText = "Confirm",
   cancelText,
   type = "warning",
+  confirmDisabled = false,
 }) => {
   if (!isOpen) return null;
 
@@ -100,9 +102,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             )}
             <button
               onClick={onConfirm}
+              disabled={confirmDisabled}
               className={`${
                 cancelText ? "flex-1" : "w-48"
-              } !font-semibold !py-3 !px-6 !rounded-xl transition-all duration-200 ${getConfirmButtonStyle()}`}
+              } !font-semibold !py-3 !px-6 !rounded-xl transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed ${getConfirmButtonStyle()}`}
             >
               {confirmText}
             </button>

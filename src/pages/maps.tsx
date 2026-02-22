@@ -10,29 +10,30 @@ export default function MapsPage() {
     name: string;
     floors: { name: string; image: string }[];
   } | null>(null);
-  const [pendingFloorImage, setPendingFloorImage] = useState<string | null>(
-    null
-  );
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [pendingFloor, setPendingFloor] = useState<{
+    mapName: string;
+    floorImage: string;
+  } | null>(null);
   const navigate = useNavigate();
 
-  const handleFloorSelect = (floorImage: string) => {
+  const handleFloorSelect = (mapName: string, floorImage: string) => {
     setSelectedMap(null);
-    setPendingFloorImage(floorImage);
-    setIsConfirmOpen(true);
+    setPendingFloor({ mapName, floorImage });
   };
 
   const handleConfirm = () => {
-    if (pendingFloorImage) {
-      navigate(`/stratmaker?mapImage=${encodeURIComponent(pendingFloorImage)}`);
-      setPendingFloorImage(null);
+    if (pendingFloor) {
+      const params = new URLSearchParams({
+        mapImage: pendingFloor.floorImage,
+        mapName: pendingFloor.mapName,
+      });
+      navigate(`/stratmaker?${params.toString()}`);
+      setPendingFloor(null);
     }
-    setIsConfirmOpen(false);
   };
 
   const handleCancel = () => {
-    setPendingFloorImage(null);
-    setIsConfirmOpen(false);
+    setPendingFloor(null);
   };
 
   return (
@@ -82,7 +83,9 @@ export default function MapsPage() {
                     (floor: { name: string; image: string }) => (
                       <motion.div
                         key={floor.name}
-                        onClick={() => handleFloorSelect(floor.image)}
+                        onClick={() =>
+                          handleFloorSelect(selectedMap.name, floor.image)
+                        }
                         className="!bg-slate-800/50 !rounded-2xl !overflow-hidden !border !border-slate-700/50 hover:!border-slate-600/50 !transition-all !duration-300 hover:!shadow-2xl hover:!shadow-slate-900/50 hover:!scale-[1.02] hover:cursor-pointer"
                       >
                         <div className="group">
@@ -106,7 +109,7 @@ export default function MapsPage() {
       </Dialog>
 
       <ConfirmationModal
-        isOpen={isConfirmOpen}
+        isOpen={!!pendingFloor}
         onClose={handleCancel}
         onConfirm={handleConfirm}
         title="Replace Current Strat?"

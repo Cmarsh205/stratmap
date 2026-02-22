@@ -11,6 +11,7 @@ import {
 } from "tldraw";
 import "tldraw/tldraw.css";
 
+import { mapsData } from "@/data/mapsData";
 import MapAndFloorMenu from "@/components/MapAndFloorMenu";
 import OperatorSidebar from "@/components/OperatorIconMenu";
 import SaveCanvasButton from "@/components/SaveBtn";
@@ -19,8 +20,11 @@ import OperatorSidebarMobile from "@/components/OperatorSidebarMobile";
 
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import { throttle } from "lodash";
 import { Trash, HelpCircle } from "lucide-react";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost";
 
 declare global {
   interface Window {
@@ -31,13 +35,17 @@ declare global {
 const Stratmaker = () => {
   const { name } = useParams();
   const location = useLocation();
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const stratIdRef = useRef<string | null>(null);
+  stratIdRef.current =
+    (location.state as { stratId?: string })?.stratId ?? null;
   const PERSISTENCE_KEY = `tldraw-strat:${name ?? "default"}`;
   const [canvasKey, setCanvasKey] = useState(0);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [isFirstVisitModalOpen, setIsFirstVisitModalOpen] = useState(false);
 
   const [store, setStore] = useState(() =>
-    createTLStore({ shapeUtils: defaultShapeUtils })
+    createTLStore({ shapeUtils: defaultShapeUtils }),
   );
   useEffect(() => {
     setStore(createTLStore({ shapeUtils: defaultShapeUtils }));
@@ -66,49 +74,157 @@ const Stratmaker = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const mapImageUrl = params.get("mapImage");
-    if (mapImageUrl) floorImageRef.current = mapImageUrl;
+    const mapName = params.get("mapName");
+    if (mapImageUrl) {
+      floorImageRef.current = mapImageUrl;
+      // Derive map name from floor image if not in URL (e.g. old links)
+      if (!mapName) {
+        const map = mapsData.find((m) =>
+          m.floors.some((f) => f.image === mapImageUrl)
+        );
+        if (map) mapNameRef.current = map.name;
+      }
+    }
+    if (mapName) mapNameRef.current = mapName;
   }, [location.search]);
 
   useLayoutEffect(() => {
     setLoadingState({ status: "loading" });
 
-    const saved = localStorage.getItem(PERSISTENCE_KEY);
-    if (saved) {
+    const stratId = (location.state as { stratId?: string })?.stratId;
+    const stratName = name ?? null;
+
+    const loadFromApi = async (): Promise<boolean> => {
+      if (!isAuthenticated) return false;
       try {
-        const parsed = JSON.parse(saved);
-        const snapshot = parsed.snapshot || parsed;
-        mapNameRef.current = snapshot?.meta?.mapName ?? parsed.mapName ?? null;
-        floorImageRef.current = parsed.floorImage ?? null;
+        let idToLoad: string | null = stratId ?? null;
 
+        if (!idToLoad && stratName) {
+          const token = await getAccessTokenSilently();
+          const listRes = await fetch(`${API_URL}/api/v1/stratmaps`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!listRes.ok) return false;
+          const listJson = await listRes.json();
+          const stratmaps: { id: string; title: string }[] =
+            listJson.data ?? [];
+          const found = stratmaps.find((s) => s.title === stratName);
+          if (found) idToLoad = found.id;
+        }
+
+        if (!idToLoad) return false;
+
+        const token = await getAccessTokenSilently();
+        const res = await fetch(`${API_URL}/api/v1/stratmaps/${idToLoad}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return false;
+        const json = await res.json();
+        const strat = json?.data;
+        if (!strat?.data) return false;
+        const d = strat.data;
+        const snapshot = d?.snapshot ?? d;
+        mapNameRef.current = d?.mapName ?? strat.description ?? null;
+        floorImageRef.current = d?.floorImage ?? null;
         loadSnapshot(store, snapshot);
-
-        setLoadingState({ status: "ready" });
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        console.error("Error loading snapshot:", err);
-        setLoadingState({ status: "error", error: message });
+        stratIdRef.current = idToLoad;
+        return true;
+      } catch {
+        return false;
       }
-    } else {
-      setLoadingState({ status: "ready" });
-    }
+    };
 
-    const cleanup = store.listen(
-      throttle(() => {
+    loadFromApi()
+      .then((loaded) => {
+        if (loaded) {
+          setLoadingState({ status: "ready" });
+          return;
+        }
+        const saved = localStorage.getItem(PERSISTENCE_KEY);
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            const snapshot = parsed.snapshot || parsed;
+            mapNameRef.current =
+              snapshot?.meta?.mapName ?? parsed.mapName ?? null;
+            floorImageRef.current = parsed.floorImage ?? null;
+            loadSnapshot(store, snapshot);
+          } catch (err: unknown) {
+            const message =
+              err instanceof Error ? err.message : "Unknown error";
+            console.error("Error loading snapshot:", err);
+            setLoadingState({ status: "error", error: message });
+            return;
+          }
+        }
+        setLoadingState({ status: "ready" });
+      })
+      .catch(() => setLoadingState({ status: "ready" }));
+
+    const saveToBackend = async () => {
+      if (!isAuthenticated) return;
+      const id = stratIdRef.current;
+      if (!id) return;
+      try {
+        const token = await getAccessTokenSilently();
         const snapshot = getSnapshot(store);
-
+        const body = {
+          title: stratName ?? "Untitled",
+          description: mapNameRef.current ?? "",
+          data: {
+            snapshot,
+            mapName: mapNameRef.current ?? null,
+            floorImage: floorImageRef.current ?? null,
+          },
+        };
+        await fetch(`${API_URL}/api/v1/stratmaps/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        });
+      } catch {
         const saveData = {
-          snapshot,
+          snapshot: getSnapshot(store),
           mapName: mapNameRef.current,
           floorImage: floorImageRef.current,
           savedAt: new Date().toISOString(),
         };
-
         localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(saveData));
-      }, 500)
-    );
+      }
+    };
+
+    const saveToLocalStorage = () => {
+      const saveData = {
+        snapshot: getSnapshot(store),
+        mapName: mapNameRef.current,
+        floorImage: floorImageRef.current,
+        savedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(saveData));
+    };
+
+    const throttledSave = throttle(() => {
+      if (isAuthenticated && stratIdRef.current) {
+        saveToBackend();
+      } else {
+        saveToLocalStorage();
+      }
+    }, 500);
+
+    const cleanup = store.listen(throttledSave);
 
     return () => cleanup();
-  }, [PERSISTENCE_KEY, store]);
+  }, [
+    PERSISTENCE_KEY,
+    store,
+    location.state,
+    isAuthenticated,
+    getAccessTokenSilently,
+    name,
+  ]);
 
   const insertFloorOnCanvas = (imageUrl: string) => {
     floorImageRef.current = imageUrl;
@@ -245,7 +361,7 @@ const Stratmaker = () => {
               }
             ).meta?.permanentLock === true ||
             (shape as { props?: { name?: string } }).props?.name ===
-              "Map Background")
+              "Map Background"),
       );
 
       if (!hasBackground) {
@@ -257,6 +373,7 @@ const Stratmaker = () => {
   const handleResetCanvas = () => setIsResetModalOpen(true);
   const confirmResetCanvas = () => {
     localStorage.removeItem(PERSISTENCE_KEY);
+    stratIdRef.current = null;
     setCanvasKey((prev) => prev + 1);
     mapNameRef.current = null;
     floorImageRef.current = null;
@@ -389,6 +506,7 @@ const Stratmaker = () => {
             store={store}
             mapNameRef={mapNameRef}
             floorImageRef={floorImageRef}
+            stratIdRef={stratIdRef}
           />
 
           <button
