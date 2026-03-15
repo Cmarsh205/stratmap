@@ -4,6 +4,7 @@ import {
   Pen,
   Folder,
   Settings,
+  Users,
   Github,
   Linkedin,
 } from "lucide-react";
@@ -16,7 +17,8 @@ const links = [
   { to: "/maps", label: "Maps", icon: Map },
   { to: "/stratmaker", label: "StratMaker", icon: Pen },
   { to: "/strats", label: "Saved Strats", icon: Folder },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/teams", label: "Teams", icon: Users },
+  { to: "/account", label: "Account", icon: Settings },
 ];
 
 const MobileNavbar = {

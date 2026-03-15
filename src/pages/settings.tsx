@@ -45,10 +45,10 @@ const Settings: React.FC = () => {
         {/* Header */}
         <div className="!mb-8">
           <h1 className="!text-4xl !font-bold !bg-gradient-to-r !from-yellow-400 !to-yellow-600 !bg-clip-text !text-transparent !mb-2">
-            Settings
+            Account Settings
           </h1>
           <p className="!text-slate-400 !text-lg">
-            Customize your StratMap experience
+            Manage your StratMap account details
           </p>
         </div>
 

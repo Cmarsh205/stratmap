@@ -5,6 +5,7 @@ import {
   Settings,
   Pen,
   Folder,
+  Users,
   Github,
   Linkedin,
   LogIn,
@@ -23,7 +24,7 @@ const Sidebar = () => {
     { to: "/maps", label: "Maps", icon: Map },
     { to: "/stratmaker", label: "StratMaker", icon: Pen },
     { to: "/strats", label: "Saved Strats", icon: Folder },
-    { to: "/settings", label: "Settings", icon: Settings },
+    { to: "/teams", label: "Teams", icon: Users },
   ];
 
   return (
@@ -58,8 +59,22 @@ const Sidebar = () => {
       </div>
 
       <div className="flex flex-col gap-4">
-        {/* Login/Logout Button */}
-        <div className="!px-4 !pb-4">
+        {/* Account + Login/Logout */}
+        <div className="!px-4 !pb-2">
+          <Link to="/account">
+            <Button
+              variant="custom"
+              className={`hover:cursor-pointer !w-full !mb-3 !flex !justify-start !gap-3 !px-4 !py-3 !rounded-xl !font-medium !transition-all !duration-200 ${
+                location.pathname === "/account"
+                  ? "!bg-yellow-500/20 !text-yellow-400 !shadow-lg !shadow-yellow-500/25"
+                  : "!text-slate-300 hover:!text-white hover:!bg-slate-800/50"
+              }`}
+            >
+              <Settings className="!mr-2 !h-6 !w-6" />
+              Account
+            </Button>
+          </Link>
+
           <Button
             variant="custom"
             onClick={() => {
